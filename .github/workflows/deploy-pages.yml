@@ -1,0 +1,51 @@
+name: Deploy SPK Generator to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: \${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: https://mqmhjgxjkapksvoorwcl.supabase.co
+      SUPABASE_ANON_KEY: sb_publishable_5QMpRNbKtXZfYdrL3C9k7Q_kseRDUJB
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check source and build public site
+        run: npm run check && npm run build
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload website files
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+      - name: Deploy public website
+        id: deployment
+        uses: actions/deploy-pages@v4
