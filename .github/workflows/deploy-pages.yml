@@ -21,8 +21,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     env:
-      SUPABASE_URL: https://mqmhjgxjkapksvoorwcl.supabase.co
-      SUPABASE_ANON_KEY: sb_publishable_5QMpRNbKtXZfYdrL3C9k7Q_kseRDUJB
+      SUPABASE_URL: https://qiahijcbyzqvcadsacpx.supabase.co
+      SUPABASE_ANON_KEY: sb_publishable_cL_l-JsOxfcwI9AmNAjJQA_9iTMx7LW
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
