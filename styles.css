@@ -234,9 +234,9 @@ textarea { min-height: 82px; resize: vertical; }
   .info dt { font-weight: 600; }
   .info dd { font-weight: 800; }
   .size-list {
-    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-    width: 100%; gap: 2mm 4mm; font-size: 10pt; line-height: 1.2;
-    text-align: center; align-items: start;
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%; gap: 2mm 3mm; font-size: 9.5pt; line-height: 1.25;
+    text-align: left; align-items: stretch;
   }
   .size-list-heading { font-size: 10pt; }
   /* Pin catatan + approval ke bagian bawah halaman ketika masih ada ruang. */
@@ -258,11 +258,19 @@ textarea { min-height: 82px; resize: vertical; }
 
   /* Compress size groups in print so the approval grid stays on the same A4 page. */
   .spk .size-list-group {
-    margin: 0; padding: 1mm 1.5mm; border-bottom: .4pt solid #d9dee4;
-    break-inside: avoid; page-break-inside: avoid;
+    min-width: 0; margin: 0; padding: 1.5mm 2mm;
+    border: .5pt solid #d3d9e0; border-radius: 1mm; background: #fff;
+    text-align: left; break-inside: avoid; page-break-inside: avoid;
   }
-  .spk .size-list-heading { margin-bottom: .7mm; font-weight: 800; letter-spacing: .015em; }
-  .spk .size-list-items { justify-content: center; gap: .6mm 2mm; font-weight: 700; }
+  .spk .size-list-heading {
+    margin: 0 0 1mm; font-weight: 800; letter-spacing: .01em; line-height: 1.15;
+    color: #111; text-align: left;
+  }
+  .spk .size-list-items {
+    display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: baseline;
+    gap: .8mm 2.5mm; font-weight: 700; text-align: left;
+  }
+  .spk .size-list-item { white-space: nowrap; }
   .spk .section-title { margin-bottom: 1.5mm; padding-bottom: 1mm; }
   .spk .approval-section { break-inside: avoid !important; page-break-inside: avoid !important; }
 }
