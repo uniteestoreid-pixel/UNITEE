@@ -205,7 +205,8 @@ textarea { min-height: 82px; resize: vertical; }
   .app-header, .editor, .preview-toolbar, .toast, .mode-notice { display: none !important; }
   .app { display: block; width: auto; max-width: none; margin: 0; padding: 0; }
   .preview-wrap { display: block; overflow: visible; }
-  .spk { display: block; width: 100%; max-width: none; min-height: 277mm; height: auto; margin: 0; padding: 0; overflow: visible; border: 0; box-shadow: none; }
+  .spk { display: flex; flex-direction: column; width: 100%; max-width: none; min-height: 277mm; height: auto; margin: 0; padding: 0; overflow: visible; border: 0; box-shadow: none; }
+  .spk > * { flex-shrink: 0; }
   .document-header { gap: 12px; padding-bottom: 3mm; }
   .logo-placeholder { width: 38mm; height: 20mm; flex: 0 0 38mm; overflow: hidden; border: 0 !important; }
   .logo-placeholder img { display: block; width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; }
@@ -225,11 +226,12 @@ textarea { min-height: 82px; resize: vertical; }
   .info { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 5mm; }
   .info > div { grid-template-columns: minmax(19mm, .85fr) minmax(0, 1.15fr); gap: 1mm; padding: 1.2mm 0; font-size: 9pt; }
   .size-list, .size-list-heading { font-size: 9pt; }
-  .notes-box { break-inside: auto; page-break-inside: auto; margin-top: 2.5mm; }
+  /* Pin catatan + approval ke bagian bawah halaman ketika masih ada ruang. */
+  .spk > .notes-box { margin-top: auto !important; break-inside: auto; page-break-inside: auto; padding-top: 0; }
   .notes-content { min-height: 6mm; font-size: 9pt; line-height: 1.25; }
-  .approval-section { margin-top: 3mm; padding-top: 0; break-inside: avoid; page-break-inside: avoid; }
-  .approval-table div { min-height: 17mm; padding: 1mm; font-size: 9pt; }
-  .approval-table .approval-head { min-height: 7mm; }
+  .approval-section { margin-top: 2mm; padding-top: 0; break-inside: avoid; page-break-inside: avoid; }
+  .approval-table div { min-height: 12mm; padding: .7mm .5mm; font-size: 9pt; line-height: 1.15; }
+  .approval-table .approval-head { min-height: 6mm; }
   .design-image-actions, .paste-hint { display: none !important; }
   img { max-width: 100%; }
   .spk .document-kicker { font-size: 10pt; }
