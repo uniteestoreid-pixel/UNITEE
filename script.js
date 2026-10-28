@@ -939,7 +939,7 @@ async function preparePrintImages() {
     .filter(image => !image.hidden && image.getAttribute("src")?.trim());
   const failedImages = async () => {
     const images = documentImages();
-    const results = await Promise.all(images.map(waitForImageReady));
+    const results = await Promise.all(images.map(image => waitForImageReady(image)));
     return images.filter((image, index) => !results[index]);
   };
 
