@@ -366,7 +366,7 @@
       const email = $("#authEmail").value.trim(); const password = $("#authPassword").value;
       if (!email || password.length < 8) { status("Masukkan email dan kata sandi minimal 8 karakter.", true); return; }
       try {
-        const { data, error } = await client.auth.signUp({ email, password, options: { data: { display_name: email.split("@")[0] } } });
+        const { data, error } = await client.auth.signUp({ email, password, options: { emailRedirectTo: `${location.origin}${location.pathname}`, data: { display_name: email.split("@")[0] } } });
         if (error) throw error;
         if (data.session) await handleSession(data.session); else status("Pendaftaran diterima. Periksa email untuk konfirmasi, lalu login.");
       } catch (error) { status(errorMessage(error), true); }
