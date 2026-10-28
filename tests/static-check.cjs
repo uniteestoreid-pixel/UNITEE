@@ -49,7 +49,10 @@ assert.match(css, /\.spk \.size-list-items\s*\{[^}]*font-weight:\s*700/s, 'Print
 assert.match(css, /\.detail-layout\s*\{[^}]*flex-direction:\s*column/s, 'Print size breakdown must sit below order details');
 assert.match(css, /\.info\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/s, 'Print order details should be arranged horizontally in four columns');
 assert.match(css, /\.info > div\s*\{[^}]*align-items:\s*center; justify-content:\s*center;/s, 'Print order details should be centered');
-assert.match(css, /\.size-list\s*\{[^}]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/s, 'Print size groups should be horizontal beneath order details');
+assert.match(css, /\.size-list\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s, 'Print size groups should be arranged in two consistent columns below order details');
+assert.match(css, /\.spk \.size-list-group\s*\{[^}]*border:\s*\.5pt solid/s, 'Print size groups should have consistent card boundaries');
+assert.match(css, /\.spk \.size-list-group\s*\{[^}]*text-align:\s*left/s, 'Print size groups should be left-aligned for readability');
+assert.match(css, /\.spk \.size-list-items\s*\{[^}]*justify-content:\s*flex-start/s, 'Print size values should start at a consistent left edge');
 
 for (const rpc of ['next_spk_number', 'save_spk', 'delete_spk', 'remove_workspace_member', 'create_workspace', 'add_workspace_member']) {
   assert.ok(cloud.includes(rpc), 'Supabase RPC reference is missing: ' + rpc);
