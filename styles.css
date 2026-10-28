@@ -207,14 +207,20 @@ textarea { min-height: 82px; resize: vertical; }
   .preview-wrap { display: block; overflow: visible; }
   .spk { display: block; width: 100%; max-width: none; min-height: 277mm; height: auto; margin: 0; padding: 0; overflow: visible; border: 0; box-shadow: none; }
   .document-header { gap: 18px; padding-bottom: 6mm; }
-  .logo-placeholder { width: 42mm; height: 25mm; flex-basis: 42mm; border: 0 !important; }
-  .logo-placeholder img { object-fit: contain; }
+  .logo-placeholder { width: 42mm; height: 25mm; flex: 0 0 42mm; overflow: hidden; border: 0 !important; }
+  .logo-placeholder img { display: block; width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; }
+  #spk .logo-placeholder #pCompanyLogo:not([hidden])[src] { display: block !important; visibility: visible !important; opacity: 1 !important; }
   .document-heading h2 { font-size: 20pt; }
   .document-meta { font-size: 10pt; }
   .document-section { margin-top: 5mm; }
   .section-title { break-after: avoid; }
   .design-section, .design-preview, .detail-layout, .approval-section { break-inside: avoid; page-break-inside: avoid; }
-  .design-preview { height: 82mm; }
+  .design-preview { height: 82mm; overflow: hidden; }
+  #spk .design-slot #designPreview[src]:not([src=""]) {
+    display: block !important; visibility: visible !important; opacity: 1 !important;
+    width: 100%; height: 100%; object-fit: contain;
+  }
+  #spk img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .detail-layout { grid-template-columns: minmax(0, 1.45fr) minmax(0, .8fr); gap: 7mm; }
   .info { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 5mm; }
   .info > div { grid-template-columns: minmax(21mm, .9fr) minmax(0, 1.1fr); font-size: 10pt; }
