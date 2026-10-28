@@ -897,15 +897,96 @@ $("#resetBtn").addEventListener("click", () => {
   if (!confirm("Mulai SPK baru? Pastikan SPK sebelumnya sudah disimpan.")) return;
   startNewSpk();
 });
-$("#printBtn").addEventListener("click", async () => {
+// Wait until every visible image in the document is actually decoded before printing.
+// Signed Supabase Storage URLs can expire, so reload the current cloud record once if needed.
+function waitForImageReady(image, timeoutMs = 15000) {
+  const source = image?.getAttribute("src")?.trim();
+  if (!image || image.hidden || !source) return Promise.resolve(true);
+
+  const isReady = () => image.complete && image.naturalWidth > 0 && image.naturalHeight > 0;
+  const verifyDecoded = async () => {
+    if (!isReady()) return false;
+    if (typeof image.decode === "function") {
+      try { await image.decode(); } catch { /* naturalWidth is checked below as a fallback */ }
+    }
+    return isReady();
+  };
+
+  if (image.complete) return verifyDecoded();
+
+  return new Promise(resolve => {
+    let settled = false;
+    let timer;
+    const finish = async loaded => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      image.removeEventListener("load", onLoad);
+      image.removeEventListener("error", onError);
+      resolve(loaded ? await verifyDecoded() : false);
+    };
+    const onLoad = () => { void finish(true); };
+    const onError = () => { void finish(false); };
+    image.addEventListener("load", onLoad);
+    image.addEventListener("error", onError);
+    timer = setTimeout(() => { void finish(isReady()); }, timeoutMs);
+    if (image.complete) void finish(isReady());
+  });
+}
+
+async function preparePrintImages() {
+  const documentImages = () => [...$("#spk").querySelectorAll("img")]
+    .filter(image => !image.hidden && image.getAttribute("src")?.trim());
+  const failedImages = async () => {
+    const images = documentImages();
+    const results = await Promise.all(images.map(waitForImageReady));
+    return images.filter((image, index) => !results[index]);
+  };
+
+  let failed = await failedImages();
+  if (failed.length && window.SpkCloud?.isActive() && currentRecordId !== null) {
+    try {
+      // Refresh signed URLs, then re-apply the server-saved record to both document images.
+      await window.SpkCloud.refresh();
+      const refreshedRecord = getSaved().find(record => String(record.id) === String(currentRecordId));
+      if (refreshedRecord) applyForm(refreshedRecord);
+      else window.SpkApp?.refreshUI?.();
+      failed = await failedImages();
+    } catch (error) {
+      console.warn("Could not refresh SPK images before printing", error);
+    }
+  }
+
+  if (failed.length) {
+    toast("Cetak dibatalkan: logo atau gambar desain belum berhasil dimuat. Coba buka ulang SPK dan cetak lagi.", "error");
+    return false;
+  }
+
+  // Give the browser two paint frames after image decoding before opening the print dialog.
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  return true;
+}
+
+async function printCurrentSpk(button) {
   syncDates();
-  if (!await persistCurrent(false)) return;
-  window.print();
+  const originalLabel = button.textContent;
+  button.disabled = true;
+  button.textContent = "Menyiapkan cetak…";
+  try {
+    if (!await persistCurrent(false)) return;
+    if (!await preparePrintImages()) return;
+    window.print();
+  } finally {
+    button.disabled = false;
+    button.textContent = originalLabel;
+  }
+}
+
+$("#printBtn").addEventListener("click", async event => {
+  await printCurrentSpk(event.currentTarget);
 });
-$("#pdfBtn").addEventListener("click", async () => {
-  syncDates();
-  if (!await persistCurrent(false)) return;
-  window.print();
+$("#pdfBtn").addEventListener("click", async event => {
+  await printCurrentSpk(event.currentTarget);
 });
 
 $("#jpgBtn").addEventListener("click", async event => {
