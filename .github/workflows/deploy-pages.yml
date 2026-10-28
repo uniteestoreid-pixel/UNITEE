@@ -32,6 +32,20 @@ jobs:
         with:
           node-version: 24
 
+      - name: Diagnose Supabase connectivity
+        shell: bash
+        run: |
+          set -u
+          echo "Probing Supabase endpoints (key values are never printed)"
+          curl -sS --max-time 20 -o /tmp/auth-health.json -w 'auth-health HTTP %{http_code}\n' "${SUPABASE_URL}/auth/v1/health" || true
+          curl -sS --max-time 20 -o /tmp/auth-settings.json -w 'auth-settings HTTP %{http_code}\n' -H "apikey: ${SUPABASE_ANON_KEY}" "${SUPABASE_URL}/auth/v1/settings" || true
+          curl -sS --max-time 20 -o /tmp/rest-openapi.json -w 'rest-root HTTP %{http_code}\n' -H "apikey: ${SUPABASE_ANON_KEY}" "${SUPABASE_URL}/rest/v1/" || true
+          printf 'auth-settings response: '
+          head -c 300 /tmp/auth-settings.json 2>/dev/null || true
+          printf '\n'
+          printf 'rest-root response starts: '
+          head -c 200 /tmp/rest-openapi.json 2>/dev/null || true
+          printf '\n'
       - name: Install dependencies
         run: npm install
 
