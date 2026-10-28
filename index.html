@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f4f6f8">
+  <title>SPK Generator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <a class="brand" href="#" aria-label="SPK Generator">
+      <span class="brand-mark" aria-hidden="true">S</span>
+      <span>SPK <b>Generator</b><small>Administrasi produksi</small></span>
+    </a>
+    <div class="header-actions">
+      <button class="btn" id="resetBtn" type="button">SPK Baru</button>
+      <button class="btn" id="saveBtn" type="button">Simpan SPK</button>
+      <button class="btn" id="backupBtn" type="button">Backup JSON</button>
+      <button class="btn" id="importBtn" type="button">Impor Backup</button>
+      <input id="importFile" type="file" accept="application/json,.json" hidden>
+      <button class="btn" id="jpgBtn" type="button">Simpan JPG</button>
+      <button class="btn" id="pdfBtn" type="button">Cetak / Simpan sebagai PDF</button>
+      <button class="btn primary" id="printBtn" type="button">Cetak SPK</button>
+    </div>
+  </header>
+
+  <div class="mode-notice" id="modeNotice" role="status"><strong>Mode lokal:</strong> arsip tersimpan di browser ini. Konfigurasikan Supabase untuk login dan sinkronisasi multiuser.</div>
+  <section class="cloud-panel" id="cloudPanel" aria-label="Akun dan workspace cloud">
+    <div class="cloud-panel-head"><div><p class="eyebrow">AKUN &amp; SINKRONISASI</p><h2>Workspace SPK</h2></div><span class="cloud-badge">Supabase</span></div>
+    <p id="cloudStatus" class="cloud-status" role="status" aria-live="polite">Memeriksa konfigurasi…</p>
+    <form id="authForm" class="auth-form">
+      <label>Email<input id="authEmail" type="email" autocomplete="username" placeholder="nama@perusahaan.com" required></label>
+      <label>Kata sandi<input id="authPassword" type="password" autocomplete="current-password" minlength="8" placeholder="Minimal 8 karakter" required></label>
+      <div class="auth-actions"><button class="btn primary" id="loginBtn" type="submit">Login</button><button class="btn" id="signupBtn" type="button">Buat akun</button><button class="btn link-btn" id="resetPasswordBtn" type="button">Lupa kata sandi?</button></div>
+    </form>
+    <div id="recoveryPanel" class="recovery-panel hidden">
+      <label>Kata sandi baru<input id="newPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Minimal 8 karakter"></label>
+      <button class="btn primary" id="saveNewPasswordBtn" type="button">Simpan kata sandi baru</button>
+    </div>
+    <div id="accountControls" class="hidden">
+      <div class="account-summary"><div><span class="muted-label">Login sebagai</span><strong id="signedInEmail"></strong><span class="muted-label">UUID akun (bagikan ke admin workspace)</span><code id="signedInId"></code></div><button class="btn small" id="copyUserIdBtn" type="button">Salin UUID</button><button class="btn small" id="signOutBtn" type="button">Logout</button></div>
+      <div id="workspaceSetup" class="workspace-setup hidden"><label>Nama workspace baru<input id="newWorkspaceName" maxlength="120" placeholder="Contoh: UNITEE Produksi"></label><button class="btn primary" id="createWorkspaceBtn" type="button">Buat workspace dan jadikan admin</button></div>
+      <div id="workspaceControls" class="workspace-controls hidden"><label>Workspace aktif<select id="workspaceSelect"></select></label><strong id="activeWorkspaceName"></strong><div class="workspace-actions"><button class="btn" id="migrateLocalBtn" type="button">Migrasikan arsip lokal ke cloud</button><span class="hint">Data lokal asli dipertahankan sebagai cadangan browser.</span></div>
+        <section id="memberAdminPanel" class="member-admin hidden"><h3>Anggota workspace</h3><p class="hint">Anggota harus mendaftar terlebih dahulu. Minta UUID akun mereka, lalu tambahkan di sini. RLS tetap memeriksa izin di database.</p><div class="member-add"><label>UUID pengguna<input id="memberUserId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off"></label><label>Peran<select id="memberRole"><option value="member">Anggota</option><option value="admin">Admin</option></select></label><button class="btn primary" id="addMemberBtn" type="button">Tambah / ubah</button></div><div id="memberList" class="member-list"></div></section>
+      </div>
+    </div>
+  </section>
+  <main class="app">
+    <section class="editor" aria-label="Formulir dan daftar SPK">
+      <section class="panel">
+        <div class="panel-head">
+          <div><p class="eyebrow">FORMULIR</p><h1>Data order</h1></div>
+          <span class="spk-no" id="spkNoBadge">SPK-000000-0000</span>
+        </div>
+        <div class="form-grid">
+          <label>Customer <span class="req">*</span><input id="customer" value="unitee" placeholder="Nama customer" autocomplete="organization"></label>
+          <label>Order <span class="req">*</span><input id="order" value="Diponegoro" placeholder="Nama order"></label>
+          <label>Tanggal order<input id="orderDate" type="date"></label>
+          <label>Deadline<input id="deadline" type="date"></label>
+          <label>Model kerah<select id="modelKerah"><option>O Neck</option><option selected>V Neck</option><option>Variasi Custom</option><option>V Neck Wangki</option><option>Kancing Wangki</option></select></label>
+          <label>Material<input id="material" value="Emblos" placeholder="Jenis bahan"></label>
+          <label>Colour<input id="colour" value="Hitam" placeholder="Warna"></label>
+          <label>Quantity <small class="hint">Otomatis dari total size</small><input id="quantity" type="number" min="0" value="0" readonly></label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><div><p class="eyebrow">PRODUKSI</p><h2>Rincian size</h2></div><div class="size-total">Total <strong id="sizeTotal">0</strong> pcs</div></div>
+        <div id="sizeGroups" class="size-groups"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><div><p class="eyebrow">IDENTITAS</p><h2>Pilihan logo</h2></div><span class="saved-count" id="logoCount">0 dari 4 logo</span></div>
+        <p class="hint logo-help">Pilih logo untuk dokumen ini atau kelola hingga empat logo. Logo disimpan di browser pada mode lokal.</p>
+        <div id="logoChoices" class="logo-choices"></div>
+        <div class="logo-list-footer"><button class="btn" id="addLogoBtn" type="button">＋ Tambah logo</button><span id="logoLimitHint" class="hint" hidden>Batas maksimal empat logo tercapai.</span></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><div><p class="eyebrow">VISUAL</p><h2>Desain</h2></div></div>
+        <div class="dropzone-wrap">
+          <div class="dropzone" id="designPasteZone" tabindex="0" role="button" aria-label="Area gambar desain. Fokuskan lalu tekan Ctrl+V atau Command+V untuk menempelkan gambar.">
+            <span class="upload-icon" aria-hidden="true">＋</span><b>Tempel atau unggah gambar desain</b>
+            <small class="paste-hint">Klik area ini, lalu tekan Ctrl + V (Windows) atau ⌘ + V (Mac)</small>
+            <img class="thumb" alt="Pratinjau gambar terunggah">
+          </div>
+          <div class="design-image-actions"><label class="btn file-pick" for="designImage">Pilih gambar<input id="designImage" type="file" accept="image/png,image/jpeg,image/webp" hidden></label>
+            <button type="button" class="remove-img" id="removeDesign" hidden>Hapus gambar</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><div><p class="eyebrow">INFORMASI TAMBAHAN</p><h2>Catatan &amp; approval</h2></div></div>
+        <label>Catatan produksi<textarea id="notes" placeholder="Tulis catatan produksi..."></textarea></label>
+        <div class="approval-inputs">
+          <label>Designer<input id="apDesigner"></label><label>CS<input id="apCs"></label>
+          <label>Customer<input id="apCustomer"></label><label>Production<input id="apProduction"></label>
+        </div>
+      </section>
+
+      <section class="panel saved-panel">
+        <div class="panel-head"><div><p class="eyebrow">ARSIP BROWSER</p><h2>SPK tersimpan</h2></div><span class="saved-count" id="savedCount">0 SPK</span></div>
+        <label class="search-field">Cari customer, order, atau nomor SPK<input id="savedTitleSearch" type="search" placeholder="Ketik kata kunci..." aria-label="Cari SPK berdasarkan customer, order, atau nomor SPK"></label>
+        <label class="search-field">Tanggal dibuat<input id="savedDateSearch" type="date" aria-label="Filter SPK berdasarkan tanggal dibuat"></label>
+        <div id="savedList" class="saved-list"><div class="empty-saved">Belum ada SPK tersimpan.</div></div>
+      </section>
+    </section>
+
+    <section class="preview-wrap" aria-label="Pratinjau dokumen SPK">
+      <div class="preview-toolbar"><div><p class="eyebrow">DOKUMEN</p><h2>Pratinjau SPK</h2></div><span>A4 · Portrait</span></div>
+      <article id="spk" class="spk">
+        <header class="document-header">
+          <div class="logo-placeholder" aria-label="Logo perusahaan"><img id="pCompanyLogo" alt="Logo perusahaan terpilih"><span id="pLogoFallback">PILIH LOGO</span></div>
+          <div class="document-heading">
+            <p class="document-kicker">DOKUMEN PRODUKSI</p>
+            <h2>SURAT PERINTAH KERJA</h2>
+            <div class="document-meta"><span>No. <b id="pSpkNo">SPK-000000-0000</b></span><span id="printDate">Tanggal dibuat: Belum disimpan</span></div>
+          </div>
+        </header>
+
+        <section class="document-section design-section">
+          <div class="section-title"><span>01</span><h3>Preview design</h3></div>
+          <div class="design-preview"><div class="design-slot"><img id="designPreview" alt="Preview gambar desain"><span class="slot-label">Gambar desain belum diunggah</span></div></div>
+        </section>
+
+        <section class="document-section">
+          <div class="section-title"><span>02</span><h3>Detail order</h3></div>
+          <div class="detail-layout">
+            <dl class="info">
+              <div><dt>Customer</dt><dd id="pCustomer">unitee</dd></div>
+              <div><dt>Order</dt><dd id="pOrder">Diponegoro</dd></div>
+              <div><dt>Tanggal order</dt><dd id="pOrderDate"></dd></div>
+              <div><dt>Deadline</dt><dd id="pDeadline"></dd></div>
+              <div><dt>Model kerah</dt><dd id="pModelKerah">V Neck</dd></div>
+              <div><dt>Material</dt><dd id="pMaterial">Emblos</dd></div>
+              <div><dt>Colour</dt><dd id="pColour">Hitam</dd></div>
+              <div><dt>Quantity</dt><dd><span id="pQuantity">0</span> pcs</dd></div>
+            </dl>
+            <div id="previewSizeBreakdown" class="size-list" aria-label="Daftar ukuran yang dipesan"></div>
+          </div>
+        </section>
+
+        <section class="document-section notes-box"><div class="section-title"><span>03</span><h3>Catatan produksi</h3></div><div id="pNotes" class="notes-content"></div></section>
+
+        <section class="document-section approval-section">
+          <div class="section-title"><span>04</span><h3>Approval</h3></div>
+          <div class="approval-table">
+            <div class="approval-head">Designer</div><div class="approval-head">CS</div><div class="approval-head">Customer</div><div class="approval-head production-head">Production</div>
+            <div id="pApDesigner"></div><div id="pApCs"></div><div id="pApCustomer"></div><div></div><div></div><div></div><div id="pApProduction"></div>
+          </div>
+        </section>
+      </article>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
+  <script src="config.js" defer></script>
+  <script src="cloud.js" defer></script>
+  <script src="script.js" defer></script>
+</body>
+</html>
