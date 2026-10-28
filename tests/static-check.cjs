@@ -46,6 +46,10 @@ assert.match(css, /@page \{ size: A4 portrait; margin: 7mm; \}/, 'Print page mus
 assert.match(css, /\.spk \.design-preview\s*\{\s*flex:\s*0 0 82mm; min-height:\s*82mm; max-height:\s*82mm;/, 'Print design preview should be enlarged and fixed');
 assert.match(css, /\.spk \.size-list, \.spk \.size-list-heading\s*\{[^}]*font-weight:\s*700/s, 'Print size details should be bold');
 assert.match(css, /\.spk \.size-list-items\s*\{[^}]*font-weight:\s*700/s, 'Print size quantities should be bold');
+assert.match(css, /\.detail-layout\s*\{[^}]*flex-direction:\s*column/s, 'Print size breakdown must sit below order details');
+assert.match(css, /\.info\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/s, 'Print order details should be arranged horizontally in four columns');
+assert.match(css, /\.info > div\s*\{[^}]*align-items:\s*center; justify-content:\s*center;/s, 'Print order details should be centered');
+assert.match(css, /\.size-list\s*\{[^}]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/s, 'Print size groups should be horizontal beneath order details');
 
 for (const rpc of ['next_spk_number', 'save_spk', 'delete_spk', 'remove_workspace_member', 'create_workspace', 'add_workspace_member']) {
   assert.ok(cloud.includes(rpc), 'Supabase RPC reference is missing: ' + rpc);
