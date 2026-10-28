@@ -34,6 +34,11 @@ const scriptIndex = html.indexOf('src="script.js"');
 assert.ok(configIndex >= 0 && configIndex < cloudIndex && cloudIndex < scriptIndex,
   'Client scripts must load in config.js -> cloud.js -> script.js order');
 assert.match(css, /@media\s+print/i, 'Print CSS is missing');
+assert.match(script, /async function preparePrintImages\(/, 'Print must wait for document images');
+assert.match(script, /images\.map\(image => waitForImageReady\(image\)\)/, 'Print image wait callback must pass the image element');
+assert.match(css, /\.spk \.size-list-group\s*\{[^}]*break-inside:\s*avoid/s, 'Print size groups should stay together');
+assert.match(css, /\.spk \.approval-section\s*\{[^}]*page-break-inside:\s*avoid/s, 'Approval section should stay together in print');
+assert.match(css, /\.spk \.size-list, \.spk \.size-list-heading\s*\{\s*font-size:\s*9pt/, 'Print size list should use compact typography');
 
 for (const rpc of ['next_spk_number', 'save_spk', 'delete_spk', 'remove_workspace_member', 'create_workspace', 'add_workspace_member']) {
   assert.ok(cloud.includes(rpc), 'Supabase RPC reference is missing: ' + rpc);
