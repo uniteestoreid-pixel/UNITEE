@@ -216,11 +216,12 @@ textarea { min-height: 82px; resize: vertical; }
   .document-section { margin-top: 3mm; }
   .section-title { break-after: avoid; }
   .design-section, .design-preview, .detail-layout, .approval-section { break-inside: avoid; page-break-inside: avoid; }
-  .design-preview { height: 58mm; overflow: hidden; }
+  .design-preview { height: 66mm; overflow: hidden; }
   #spk .design-slot #designPreview[src]:not([src=""]) {
     display: block !important; visibility: visible !important; opacity: 1 !important;
     width: 100%; height: 100%; object-fit: contain;
   }
+  .spk .design-preview { flex: 0 0 66mm; min-height: 66mm; max-height: 66mm; }
   #spk img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .detail-layout { grid-template-columns: minmax(0, 1.45fr) minmax(0, .8fr); gap: 5mm; }
   .info { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 5mm; }
@@ -240,13 +241,13 @@ textarea { min-height: 82px; resize: vertical; }
   .spk .section-title > span { font-size: 10pt; }
   .spk .section-title h3 { font-size: 10pt; }
   .spk .info > div { font-size: 9pt; }
-  .spk .size-list, .spk .size-list-heading { font-size: 9pt; line-height: 1.2; }
+  .spk .size-list, .spk .size-list-heading { font-size: 9pt; line-height: 1.2; font-weight: 700; color: #111; }
   .spk .notes-content, .spk .approval-table div { font-size: 9pt; line-height: 1.2; }
 
   /* Compress size groups in print so the approval grid stays on the same A4 page. */
   .spk .size-list-group { margin-bottom: 1mm; break-inside: avoid; page-break-inside: avoid; }
-  .spk .size-list-heading { margin-bottom: .4mm; }
-  .spk .size-list-items { gap: .5mm 2mm; }
+  .spk .size-list-heading { margin-bottom: .6mm; font-weight: 800; letter-spacing: .015em; }
+  .spk .size-list-items { gap: .6mm 2mm; font-weight: 700; }
   .spk .section-title { margin-bottom: 1.5mm; padding-bottom: 1mm; }
   .spk .approval-section { break-inside: avoid !important; page-break-inside: avoid !important; }
 }
