@@ -216,17 +216,17 @@ textarea { min-height: 82px; resize: vertical; }
   .document-section { margin-top: 3mm; }
   .section-title { break-after: avoid; }
   .design-section, .design-preview, .detail-layout, .approval-section { break-inside: avoid; page-break-inside: avoid; }
-  .design-preview { height: 66mm; overflow: hidden; }
+  .design-preview { height: 82mm; overflow: hidden; }
   #spk .design-slot #designPreview[src]:not([src=""]) {
     display: block !important; visibility: visible !important; opacity: 1 !important;
     width: 100%; height: 100%; object-fit: contain;
   }
-  .spk .design-preview { flex: 0 0 66mm; min-height: 66mm; max-height: 66mm; }
+  .spk .design-preview { flex: 0 0 82mm; min-height: 82mm; max-height: 82mm; }
   #spk img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .detail-layout { grid-template-columns: minmax(0, 1.45fr) minmax(0, .8fr); gap: 5mm; }
   .info { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 5mm; }
-  .info > div { grid-template-columns: minmax(19mm, .85fr) minmax(0, 1.15fr); gap: 1mm; padding: 1.2mm 0; font-size: 9pt; }
-  .size-list, .size-list-heading { font-size: 9pt; }
+  .info > div { grid-template-columns: minmax(19mm, .85fr) minmax(0, 1.15fr); gap: 1mm; padding: 1.3mm 0; font-size: 10pt; }
+  .size-list, .size-list-heading { font-size: 10pt; }
   /* Pin catatan + approval ke bagian bawah halaman ketika masih ada ruang. */
   .spk > .notes-box { margin-top: auto !important; break-inside: auto; page-break-inside: auto; padding-top: 0; }
   .notes-content { min-height: 6mm; font-size: 9pt; line-height: 1.25; }
@@ -239,9 +239,9 @@ textarea { min-height: 82px; resize: vertical; }
   .spk .document-heading h2 { font-size: 19pt; }
   .spk .document-meta { font-size: 9pt; gap: 2mm 4mm; margin-top: 4px; }
   .spk .section-title > span { font-size: 10pt; }
-  .spk .section-title h3 { font-size: 10pt; }
-  .spk .info > div { font-size: 9pt; }
-  .spk .size-list, .spk .size-list-heading { font-size: 9pt; line-height: 1.2; font-weight: 700; color: #111; }
+  .spk .section-title h3 { font-size: 10.5pt; }
+  .spk .info > div { font-size: 10pt; }
+  .spk .size-list, .spk .size-list-heading { font-size: 10pt; line-height: 1.2; font-weight: 700; color: #111; }
   .spk .notes-content, .spk .approval-table div { font-size: 9pt; line-height: 1.2; }
 
   /* Compress size groups in print so the approval grid stays on the same A4 page. */
