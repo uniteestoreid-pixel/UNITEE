@@ -198,7 +198,7 @@ textarea { min-height: 82px; resize: vertical; }
   .logo-choices { grid-template-columns: 1fr; }
 }
 
-@page { size: A4 portrait; margin: 10mm; }
+@page { size: A4 portrait; margin: 7mm; }
 @media print {
   html, body { width: auto; min-width: 0; margin: 0; background: #fff !important; }
   body { color: #111; font-family: Arial, Helvetica, sans-serif; }
@@ -206,40 +206,47 @@ textarea { min-height: 82px; resize: vertical; }
   .app { display: block; width: auto; max-width: none; margin: 0; padding: 0; }
   .preview-wrap { display: block; overflow: visible; }
   .spk { display: block; width: 100%; max-width: none; min-height: 277mm; height: auto; margin: 0; padding: 0; overflow: visible; border: 0; box-shadow: none; }
-  .document-header { gap: 18px; padding-bottom: 6mm; }
-  .logo-placeholder { width: 42mm; height: 25mm; flex: 0 0 42mm; overflow: hidden; border: 0 !important; }
+  .document-header { gap: 12px; padding-bottom: 3mm; }
+  .logo-placeholder { width: 38mm; height: 20mm; flex: 0 0 38mm; overflow: hidden; border: 0 !important; }
   .logo-placeholder img { display: block; width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; }
   #spk .logo-placeholder #pCompanyLogo:not([hidden])[src] { display: block !important; visibility: visible !important; opacity: 1 !important; }
   .document-heading h2 { font-size: 20pt; }
   .document-meta { font-size: 10pt; }
-  .document-section { margin-top: 5mm; }
+  .document-section { margin-top: 3mm; }
   .section-title { break-after: avoid; }
   .design-section, .design-preview, .detail-layout, .approval-section { break-inside: avoid; page-break-inside: avoid; }
-  .design-preview { height: 82mm; overflow: hidden; }
+  .design-preview { height: 58mm; overflow: hidden; }
   #spk .design-slot #designPreview[src]:not([src=""]) {
     display: block !important; visibility: visible !important; opacity: 1 !important;
     width: 100%; height: 100%; object-fit: contain;
   }
   #spk img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .detail-layout { grid-template-columns: minmax(0, 1.45fr) minmax(0, .8fr); gap: 7mm; }
+  .detail-layout { grid-template-columns: minmax(0, 1.45fr) minmax(0, .8fr); gap: 5mm; }
   .info { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 5mm; }
-  .info > div { grid-template-columns: minmax(21mm, .9fr) minmax(0, 1.1fr); font-size: 10pt; }
-  .size-list, .size-list-heading { font-size: 10pt; }
-  .notes-box { break-inside: auto; page-break-inside: auto; }
-  .notes-content { min-height: 12mm; font-size: 10pt; }
-  .approval-section { margin-top: 6mm; padding-top: 0; }
-  .approval-table div { min-height: 22mm; font-size: 10pt; }
-  .approval-table .approval-head { min-height: 10mm; }
+  .info > div { grid-template-columns: minmax(19mm, .85fr) minmax(0, 1.15fr); gap: 1mm; padding: 1.2mm 0; font-size: 9pt; }
+  .size-list, .size-list-heading { font-size: 9pt; }
+  .notes-box { break-inside: auto; page-break-inside: auto; margin-top: 2.5mm; }
+  .notes-content { min-height: 6mm; font-size: 9pt; line-height: 1.25; }
+  .approval-section { margin-top: 3mm; padding-top: 0; break-inside: avoid; page-break-inside: avoid; }
+  .approval-table div { min-height: 17mm; padding: 1mm; font-size: 9pt; }
+  .approval-table .approval-head { min-height: 7mm; }
   .design-image-actions, .paste-hint { display: none !important; }
   img { max-width: 100%; }
   .spk .document-kicker { font-size: 10pt; }
-  .spk .document-heading h2 { font-size: 23pt; }
-  .spk .document-meta { font-size: 11.5pt; }
+  .spk .document-heading h2 { font-size: 19pt; }
+  .spk .document-meta { font-size: 9pt; gap: 2mm 4mm; margin-top: 4px; }
   .spk .section-title > span { font-size: 10pt; }
-  .spk .section-title h3 { font-size: 12pt; }
-  .spk .info > div { font-size: 11.5pt; }
-  .spk .size-list, .spk .size-list-heading { font-size: 11.5pt; }
-  .spk .notes-content, .spk .approval-table div { font-size: 11.5pt; }
+  .spk .section-title h3 { font-size: 10pt; }
+  .spk .info > div { font-size: 9pt; }
+  .spk .size-list, .spk .size-list-heading { font-size: 9pt; line-height: 1.2; }
+  .spk .notes-content, .spk .approval-table div { font-size: 9pt; line-height: 1.2; }
+
+  /* Compress size groups in print so the approval grid stays on the same A4 page. */
+  .spk .size-list-group { margin-bottom: 1mm; break-inside: avoid; page-break-inside: avoid; }
+  .spk .size-list-heading { margin-bottom: .4mm; }
+  .spk .size-list-items { gap: .5mm 2mm; }
+  .spk .section-title { margin-bottom: 1.5mm; padding-bottom: 1mm; }
+  .spk .approval-section { break-inside: avoid !important; page-break-inside: avoid !important; }
 }
 @media (max-width: 520px) {
   .spk .document-heading h2 { font-size: 16pt; }
