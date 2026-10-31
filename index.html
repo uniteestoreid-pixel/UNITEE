@@ -26,6 +26,11 @@
     </div>
   </header>
 
+  <nav class="page-nav" id="pageNav" aria-label="Menu utama">
+    <button class="page-tab active" id="spkPageTab" type="button" role="tab" aria-selected="true">SPK Produksi · Jersey / Batik</button>
+    <button class="page-tab" id="accessoryPageTab" type="button" role="tab" aria-selected="false">SPK Aksesoris UNITEE</button>
+  </nav>
+
   <div class="mode-notice" id="modeNotice" role="status"><strong>Mode lokal:</strong> arsip tersimpan di browser ini. Konfigurasikan Supabase untuk login dan sinkronisasi multiuser.</div>
   <section class="cloud-panel" id="cloudPanel" aria-label="Akun dan workspace cloud">
     <div class="cloud-panel-head"><div><p class="eyebrow">AKUN &amp; SINKRONISASI</p><h2>Workspace SPK</h2></div><span class="cloud-badge">Supabase</span></div>
@@ -155,11 +160,135 @@
       </article>
     </section>
   </main>
+
+  <section id="accessoryPage" class="accessory-page" aria-label="SPK Aksesoris UNITEE" hidden>
+    <header class="accessory-page-head">
+      <div>
+        <p class="eyebrow">UNITEE · PRODUKSI AKSESORIS</p>
+        <h1>SPK Aksesoris</h1>
+        <p class="accessory-intro">Buat dan kelola pesanan topi, tas, lanyard, kaos kaki, pin, pouch, dan aksesoris custom dalam satu arsip workspace.</p>
+      </div>
+      <div class="accessory-page-actions">
+        <button class="btn" id="accessoryNewBtn" type="button">SPK Aksesoris Baru</button>
+        <button class="btn primary" id="accessorySaveBtn" type="button">Simpan Aksesoris</button>
+      </div>
+    </header>
+    <p id="accessoryStatus" class="accessory-status" role="status" aria-live="polite">Menyiapkan modul aksesoris…</p>
+
+    <div class="accessory-layout">
+      <section class="accessory-editor-card" id="accessoryEditor" aria-label="Form SPK Aksesoris">
+        <div class="accessory-card-head" id="accessoryFormTop">
+          <div><p class="eyebrow">FORMULIR BARU</p><h2>Informasi pesanan</h2></div>
+          <span class="accessory-number" id="accSpkNo">AKS-00000000-0000</span>
+        </div>
+        <div class="accessory-form-grid">
+          <label class="accessory-field">Customer / divisi<input id="accCustomer" maxlength="200" placeholder="Nama customer atau divisi"></label>
+          <label class="accessory-field">Nama order<input id="accOrder" maxlength="200" placeholder="Contoh: Merchandise event UNITEE"></label>
+          <label class="accessory-field">Tanggal order<input id="accOrderDate" type="date"></label>
+          <label class="accessory-field">Deadline<input id="accDeadline" type="date"></label>
+          <label class="accessory-field accessory-field-wide">PIC / pemesan<input id="accRequester" maxlength="160" placeholder="Nama PIC yang mengajukan"></label>
+        </div>
+
+        <div class="accessory-section-head">
+          <div><p class="eyebrow">DAFTAR PRODUK</p><h2>Rincian aksesoris</h2></div>
+          <span class="accessory-count" id="accessoryItemCount">1 item</span>
+        </div>
+        <div id="accessoryItemRows" class="accessory-item-rows"></div>
+        <button class="btn accessory-add-btn" id="accessoryAddItemBtn" type="button">＋ Tambah item aksesoris</button>
+
+        <div class="accessory-section-head">
+          <div><p class="eyebrow">REFERENSI</p><h2>Gambar / contoh produk</h2></div>
+          <span class="hint">Opsional · JPG, PNG, WEBP · maks. 8 MB</span>
+        </div>
+        <div class="accessory-upload">
+          <label class="btn file-pick" for="accReferenceInput">Pilih gambar referensi<input id="accReferenceInput" type="file" accept="image/jpeg,image/png,image/webp" hidden></label>
+          <button class="btn" id="accRemoveImageBtn" type="button">Hapus gambar</button>
+          <span class="hint">Gambar disimpan privat di workspace dan hanya dapat dilihat anggota yang memiliki akses.</span>
+        </div>
+
+        <label class="accessory-field accessory-notes">Catatan produksi<textarea id="accNotes" maxlength="10000" rows="3" placeholder="Ukuran khusus, penempatan logo, teknik produksi, packing, dan catatan lainnya…"></textarea></label>
+
+        <div class="accessory-section-head">
+          <div><p class="eyebrow">PERSETUJUAN</p><h2>Approval</h2></div>
+        </div>
+        <div class="accessory-approval-grid">
+          <label class="accessory-field">Designer<input id="accApDesigner" maxlength="160"></label>
+          <label class="accessory-field">CS<input id="accApCs" maxlength="160"></label>
+          <label class="accessory-field">Customer<input id="accApCustomer" maxlength="160"></label>
+          <label class="accessory-field">Production<input id="accApProduction" maxlength="160"></label>
+        </div>
+        <div class="accessory-footer-actions">
+          <button class="btn" id="accessoryPrintBtn" type="button">Cetak / Simpan PDF</button>
+          <button class="btn danger-action" id="accessoryDeleteBtn" type="button">Arsipkan SPK</button>
+          <button class="btn" id="accessoryRefreshBtn" type="button">Muat ulang arsip</button>
+        </div>
+      </section>
+
+      <aside class="accessory-side">
+        <section class="accessory-preview-card">
+          <div class="accessory-card-head">
+            <div><p class="eyebrow">DOKUMEN</p><h2>Pratinjau SPK Aksesoris</h2></div>
+            <span class="accessory-count">A4 · Portrait</span>
+          </div>
+          <article id="accessoryPrintDocument" class="accessory-print-document">
+            <header class="accessory-document-header">
+              <div class="accessory-document-brand"><strong>UNITEE</strong><span>CUSTOM APPAREL</span></div>
+              <div class="accessory-document-title"><p>DOKUMEN PRODUKSI</p><h2>SURAT PERINTAH KERJA AKSESORIS</h2><span>No. <b id="accPreviewNumber">—</b></span></div>
+            </header>
+            <div class="accessory-document-meta">
+              <div><span>Customer / divisi</span><strong id="accPreviewCustomer">—</strong></div>
+              <div><span>Nama order</span><strong id="accPreviewOrder">—</strong></div>
+              <div><span>Tanggal order</span><strong id="accPreviewDate">—</strong></div>
+              <div><span>Deadline</span><strong id="accPreviewDeadline">—</strong></div>
+              <div><span>PIC / pemesan</span><strong id="accPreviewRequester">—</strong></div>
+            </div>
+            <section class="accessory-document-section">
+              <h3>01 · RINCIAN AKSESORIS</h3>
+              <div class="accessory-print-table-wrap">
+                <table class="accessory-print-table">
+                  <thead><tr><th>No.</th><th>Jenis / nama item</th><th>Spesifikasi</th><th>Jumlah</th></tr></thead>
+                  <tbody id="accPreviewItems"></tbody>
+                  <tfoot><tr><th colspan="3">TOTAL</th><th id="accPreviewTotal">0 pcs</th></tr></tfoot>
+                </table>
+              </div>
+            </section>
+            <section class="accessory-document-section accessory-reference-section">
+              <h3>02 · GAMBAR REFERENSI</h3>
+              <div class="accessory-reference-frame"><img id="accPreviewImage" alt="Gambar referensi aksesoris" hidden><span id="accPreviewImageEmpty">Tidak ada gambar referensi</span></div>
+            </section>
+            <section class="accessory-document-section accessory-document-notes">
+              <h3>03 · CATATAN PRODUKSI</h3>
+              <p id="accPreviewNotes">—</p>
+            </section>
+            <section class="accessory-document-section accessory-document-approval">
+              <h3>04 · APPROVAL</h3>
+              <div class="accessory-signatures">
+                <div><strong>Designer</strong><span id="accPreviewDesigner">—</span></div>
+                <div><strong>CS</strong><span id="accPreviewCs">—</span></div>
+                <div><strong>Customer</strong><span id="accPreviewCustomerApproval">—</span></div>
+                <div><strong>Production</strong><span id="accPreviewProduction">—</span></div>
+              </div>
+            </section>
+          </article>
+        </section>
+
+        <section class="accessory-history-card">
+          <div class="accessory-card-head">
+            <div><p class="eyebrow">WORKSPACE</p><h2>Arsip SPK Aksesoris</h2></div>
+            <span id="accessoryHistoryCount" class="accessory-count">0 dokumen</span>
+          </div>
+          <div id="accessoryHistory" class="accessory-history"><div class="accessory-empty-state">Memuat arsip…</div></div>
+        </section>
+      </aside>
+    </div>
+  </section>
+
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
   <script src="config.js" defer></script>
   <script src="cloud.js?v=20261031-account-menu" defer></script>
+  <script src="accessories.js" defer></script>
   <script src="script.js" defer></script>
 </body>
 </html>
