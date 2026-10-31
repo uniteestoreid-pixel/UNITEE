@@ -37,9 +37,10 @@ assert.deepEqual(missingSelectors, [], 'JavaScript references HTML IDs that do n
 assert.match(html, /href=["']styles\.css["']/, 'Stylesheet link is missing');
 const configIndex = html.indexOf('src="config.js"');
 const cloudIndex = html.search(/src="cloud\.js(?:\?[^\"]*)?"/);
+const accessoriesIndex = html.indexOf('src="accessories.js"');
 const scriptIndex = html.indexOf('src="script.js"');
-assert.ok(configIndex >= 0 && configIndex < cloudIndex && cloudIndex < scriptIndex,
-  'Client scripts must load in config.js -> cloud.js -> script.js order');
+assert.ok(configIndex >= 0 && configIndex < cloudIndex && cloudIndex < accessoriesIndex && accessoriesIndex < scriptIndex,
+  'Client scripts must load in config.js -> cloud.js -> accessories.js -> script.js order');
 assert.match(css, /@media\s+print/i, 'Print CSS is missing');
 assert.match(script, /async function preparePrintImages\(/, 'Print must wait for document images');
 assert.match(script, /images\.map\(image => waitForImageReady\(image\)\)/, 'Print image wait callback must pass the image element');
@@ -112,6 +113,62 @@ assert.match(build, /SUPABASE_URL/, 'Build must read SUPABASE_URL');
 assert.match(build, /SUPABASE_ANON_KEY/, 'Build must read SUPABASE_ANON_KEY');
 assert.equal(pkg.scripts?.build, 'node build-config.cjs', 'Unexpected build command');
 
-console.log('Static checks passed: UI selectors, print layout, workspace isolation, autosave recovery, and private Supabase access.');
+const accessoryPrintStart = css.lastIndexOf('@media print {');
+const accessoryPrintEnd = css.indexOf('\n@media (max-width: 980px)', accessoryPrintStart);
+const accessoryPrintCss = css.slice(accessoryPrintStart, accessoryPrintEnd < 0 ? undefined : accessoryPrintEnd);
+const printRuleBody = (source, selector) => {
+  const selectorIndex = source.indexOf(selector);
+  assert.ok(selectorIndex >= 0, 'Missing print selector: ' + selector);
+  const openingBrace = source.indexOf('{', selectorIndex);
+  const closingBrace = source.indexOf('}', openingBrace);
+  assert.ok(openingBrace >= 0 && closingBrace > openingBrace, 'Malformed print rule: ' + selector);
+  return source.slice(openingBrace + 1, closingBrace);
+};
+
+assert.match(accessoryPrintCss, /@page accessory-a4 \{ size: A4 portrait; margin: 10mm; \}/,
+  'Accessory print must use its own A4 portrait page with standard 10mm margins');
+assert.doesNotMatch(accessoryPrintCss, /@page\s*\{/,
+  'Accessory print page settings must not override the original SPK page');
+const accessoryDocumentRule = printRuleBody(accessoryPrintCss, 'body.accessory-mode #accessoryPrintDocument');
+assert.match(accessoryDocumentRule, /page:\s*accessory-a4;/, 'Accessory document must use the named A4 page');
+assert.match(accessoryDocumentRule, /width:\s*100%;/, 'Accessory document must fill only its available page width');
+assert.match(accessoryDocumentRule, /max-width:\s*190mm;/, 'Accessory document must fit the A4 content box');
+assert.match(accessoryDocumentRule, /box-sizing:\s*border-box;/, 'Accessory width must include its box sizing');
+assert.match(accessoryDocumentRule, /overflow-wrap:\s*anywhere;/, 'Long accessory text must wrap');
+assert.match(accessoryPrintCss, /body\.accessory-mode \.app\s*,[\s\S]*?body\.accessory-mode \.accessory-page-head/,
+  'Printing accessories must hide the original jersey and batik SPK page');
+assert.match(accessoryPrintCss, /body\.accessory-mode \.accessory-preview-card\s*\{[^}]*padding:\s*0 !important;[^}]*border:\s*0 !important;[^}]*box-shadow:\s*none !important;/s,
+  'Accessory print cards must not add screen padding, borders, or shadows');
+const accessoryTableRule = printRuleBody(accessoryPrintCss, 'body.accessory-mode .accessory-print-table {');
+assert.match(accessoryTableRule, /width:\s*100%;/, 'Accessory table must use the content width');
+assert.match(accessoryTableRule, /max-width:\s*100%;/, 'Accessory table must not overflow horizontally');
+assert.match(accessoryTableRule, /table-layout:\s*fixed;/, 'Accessory table must use fixed layout');
+assert.match(html, /<colgroup>\s*<col style="width: 7%">\s*<col style="width: 28%">\s*<col style="width: 49%">\s*<col style="width: 16%">\s*<\/colgroup>/,
+  'Accessory table must define column widths that fit the page');
+assert.match(accessoryPrintCss, /body\.accessory-mode \.accessory-print-table thead\s*\{\s*display:\s*table-header-group;\s*\}/,
+  'Accessory table headers must repeat across printed pages');
+assert.match(accessoryPrintCss, /body\.accessory-mode \.accessory-print-table tbody tr\s*\{[^}]*break-inside:\s*avoid;[^}]*page-break-inside:\s*avoid;/s,
+  'Accessory table rows should stay together when they fit on a page');
+const accessoryTableCellRule = printRuleBody(accessoryPrintCss, 'body.accessory-mode .accessory-print-table th,');
+assert.match(accessoryTableCellRule, /white-space:\s*normal;/, 'Accessory table cells must allow line wrapping');
+assert.match(accessoryTableCellRule, /overflow-wrap:\s*anywhere;/, 'Long text inside accessory table cells must wrap');
+assert.match(accessoryPrintCss, /body\.accessory-mode \.accessory-document-section\s*\{[^}]*break-inside:\s*auto;[^}]*page-break-inside:\s*auto;/s,
+  'Long accessory sections and item tables must be allowed to paginate');
+assert.match(accessoryPrintCss, /body\.accessory-mode \.accessory-reference-frame img\s*\{[^}]*width:\s*100%;[^}]*max-width:\s*100%;[^}]*max-height:\s*60mm;[^}]*object-fit:\s*contain;/s,
+  'Accessory reference images must fit the page without cropping');
+assert.match(accessoryPrintCss, /body\.accessory-mode \.accessory-document-approval\s*\{[^}]*break-inside:\s*avoid;[^}]*page-break-inside:\s*avoid;/s,
+  'Accessory approval signatures should stay together');
+assert.match(accessoryPrintCss, /body\.accessory-mode \.accessory-signatures > div\s*\{[^}]*min-height:\s*24mm;/s,
+  'Accessory signature blocks must remain compact');
+assert.doesNotMatch(accessoryPrintCss, /height:\s*297mm|transform:\s*scale/i,
+  'Accessory print must paginate vertically without fixed-height scaling');
+assert.ok(html.indexOf('src="accessories.js"') < html.indexOf('src="script.js"'),
+  'Accessory script must load before the original SPK script');
+assert.ok(pkg.scripts?.check?.includes('node --check accessories.js'),
+  'The accessory module must be syntax-checked');
+assert.ok(build.includes("'accessories.js'"), 'GitHub Pages build must include the accessory module');
+
+console.log('Static checks passed: UI selectors, A4 accessory pagination, workspace isolation, autosave recovery, and private Supabase access.');
+
 
 
