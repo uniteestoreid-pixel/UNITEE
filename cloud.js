@@ -5,6 +5,8 @@
   const LOGO_KEY = "spk_generator_logos_v1";
   const MIGRATION_RECORDS_KEY = "spk_generator_precloud_records_v1";
   const MIGRATION_LOGOS_KEY = "spk_generator_precloud_logos_v1";
+  const CACHE_SOURCE_KEY = "spk_generator_cache_source_v1";
+  const ACTIVE_WORKSPACE_KEY = "spk_generator_active_workspace_v1:";
   const BUCKET = "spk-files";
   let client = null;
   let session = null;
@@ -15,11 +17,28 @@
   let initialized = false;
   let switchingWorkspace = false;
   let recoveryMode = false;
+  let sessionEpoch = 0;
+  let workspaceLoadGeneration = 0;
+  let activationGeneration = 0;
+  let activeUserId = null;
+  let signedUrlFailures = 0;
 
   const $ = selector => document.querySelector(selector);
   const configured = () => Boolean(String(window.SPK_CONFIG?.supabaseUrl || "").trim() && String(window.SPK_CONFIG?.supabaseAnonKey || "").trim());
   const isActive = () => Boolean(client && session && workspaceId);
   const isAdmin = () => currentRole === "admin";
+  function captureWorkspaceContext(expected = {}) {
+    const context = { workspaceId, userId: session?.user?.id || null, epoch: sessionEpoch, client };
+    if (!isActive() || (expected.workspaceId && expected.workspaceId !== context.workspaceId) || (expected.userId && expected.userId !== context.userId)) {
+      throw new Error("Workspace atau akun berubah. Muat ulang SPK sebelum menyimpan.");
+    }
+    return context;
+  }
+  function assertWorkspaceContext(context) {
+    if (!isActive() || context.epoch !== sessionEpoch || context.workspaceId !== workspaceId || context.userId !== session?.user?.id || context.client !== client) {
+      throw new Error("Akun atau workspace berubah saat penyimpanan berlangsung. Buka kembali SPK sebelum mencoba lagi.");
+    }
+  }
   const safeJson = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch { return fallback; } };
   const emit = (type, detail = {}) => window.dispatchEvent(new CustomEvent(`spkcloud:${type}`, { detail }));
 
@@ -61,6 +80,8 @@
   }
 
   function captureLocalSnapshot() {
+    // Cloud cache is never treated as a local archive or copied into another user's migration backup.
+    if (localStorage.getItem(CACHE_SOURCE_KEY) === "cloud") return;
     const recordsKeyExists = localStorage.getItem(MIGRATION_RECORDS_KEY) !== null;
     const logosKeyExists = localStorage.getItem(MIGRATION_LOGOS_KEY) !== null;
     if (recordsKeyExists && logosKeyExists) return;
@@ -74,6 +95,28 @@
     }
   }
 
+  function setActiveCache(records, logos, source) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    localStorage.setItem(LOGO_KEY, JSON.stringify(logos));
+    localStorage.setItem(CACHE_SOURCE_KEY, source);
+    emit("loaded", { workspaceId, workspaceName, count: records.length, logos: logos.length });
+  }
+
+  function clearActiveCache(source = "cloud") {
+    setActiveCache([], [], source);
+    window.SpkApp?.refreshUI?.();
+  }
+
+  function restoreLocalSnapshot() {
+    const hasLocalBackup = localStorage.getItem(MIGRATION_RECORDS_KEY) !== null || localStorage.getItem(MIGRATION_LOGOS_KEY) !== null;
+    const wasCloudCache = localStorage.getItem(CACHE_SOURCE_KEY) === "cloud";
+    const records = hasLocalBackup ? safeJson(MIGRATION_RECORDS_KEY, []) : (wasCloudCache ? [] : safeJson(STORAGE_KEY, []));
+    const logos = hasLocalBackup ? safeJson(MIGRATION_LOGOS_KEY, []) : (wasCloudCache ? [] : safeJson(LOGO_KEY, []));
+    setActiveCache(records, logos, "local");
+  }
+
+  const workspacePreferenceKey = userId => `${ACTIVE_WORKSPACE_KEY}${userId}`;
+
   function dataUrlBlob(dataUrl) {
     if (!/^data:image\/(png|jpeg|webp|svg\+xml);base64,/i.test(dataUrl)) throw new Error("Format gambar tidak didukung untuk unggah.");
     return fetch(dataUrl).then(response => response.blob());
@@ -83,10 +126,10 @@
     return ({ "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/svg+xml": "svg" })[mime] || "bin";
   }
 
-  async function uploadDataUrl(dataUrl, pathPrefix) {
+  async function uploadDataUrl(dataUrl, pathPrefix, targetWorkspaceId = workspaceId) {
     const blob = await dataUrlBlob(dataUrl);
     if (blob.size > 15 * 1024 * 1024) throw new Error("Gambar melebihi batas 15 MB.");
-    const path = `${workspaceId}/${pathPrefix}/${crypto.randomUUID()}.${extensionFor(blob.type)}`;
+    const path = `${targetWorkspaceId}/${pathPrefix}/${crypto.randomUUID()}.${extensionFor(blob.type)}`;
     const { error } = await client.storage.from(BUCKET).upload(path, blob, { contentType: blob.type, upsert: false, cacheControl: "3600" });
     if (error) throw error;
     return { path, blob };
@@ -102,11 +145,13 @@
   async function saveLogo(logo) {
     if (!isActive()) return { ...logo };
     if (!isAdmin()) throw new Error("Hanya admin workspace yang dapat mengelola logo bersama.");
+    const context = captureWorkspaceContext();
     let path = logo.storagePath || null;
     let version = Number(logo.version) || 1;
     let blob = null;
     if (typeof logo.dataUrl === "string" && logo.dataUrl.startsWith("data:image/")) {
-      const uploaded = await uploadDataUrl(logo.dataUrl, `logos/${logo.id}`);
+      const uploaded = await uploadDataUrl(logo.dataUrl, `logos/${logo.id}`, context.workspaceId);
+      assertWorkspaceContext(context);
       path = uploaded.path;
       blob = uploaded.blob;
       version += 1;
@@ -114,10 +159,11 @@
     const idMatch = String(logo.id).match(/(?:logo-)?([1-4])$/i);
     const slot = Number(logo.slot) || Number(idMatch?.[1]) || 1;
     const row = {
-      id: String(logo.id), workspace_id: workspaceId, slot, label: String(logo.label || `Logo ${slot}`).slice(0, 40),
+      id: String(logo.id), workspace_id: context.workspaceId, slot, label: String(logo.label || `Logo ${slot}`).slice(0, 40),
       storage_path: path, version, is_active: true, created_by: session.user.id, updated_at: new Date().toISOString()
     };
-    const { error } = await client.from("company_logos").upsert(row, { onConflict: "workspace_id,id" });
+    assertWorkspaceContext(context);
+    const { error } = await context.client.from("company_logos").upsert(row, { onConflict: "workspace_id,id" });
     if (error) throw error;
     return { ...logo, storagePath: path, version, slot, dataUrl: path ? await signPath(path) : "", active: true, fileSize: blob?.size || logo.fileSize || null };
   }
@@ -138,11 +184,18 @@
 
   async function loadWorkspaceData() {
     if (!isActive()) return;
+    const loadWorkspaceId = workspaceId;
+    const loadUserId = session.user.id;
+    const loadEpoch = sessionEpoch;
+    const loadGeneration = ++workspaceLoadGeneration;
+    const isCurrentLoad = () => isActive() && workspaceId === loadWorkspaceId && session?.user?.id === loadUserId && sessionEpoch === loadEpoch && workspaceLoadGeneration === loadGeneration;
+    signedUrlFailures = 0;
     status(`Memuat arsip workspace “${workspaceName}”…`);
     const rawRecords = [];
     for (let offset = 0; ; offset += 500) {
-      const { data, error } = await client.from("spk_records").select("*").eq("workspace_id", workspaceId).is("deleted_at", null).order("updated_at", { ascending: false }).range(offset, offset + 499);
+      const { data, error } = await client.from("spk_records").select("*").eq("workspace_id", loadWorkspaceId).is("deleted_at", null).order("updated_at", { ascending: false }).range(offset, offset + 499);
       if (error) throw error;
+      if (!isCurrentLoad()) return;
       rawRecords.push(...(data || []));
       if (!data || data.length < 500) break;
     }
@@ -158,12 +211,13 @@
       if (sizeResult.error) throw sizeResult.error;
       if (approvalResult.error) throw approvalResult.error;
       if (designResult.error) throw designResult.error;
+      if (!isCurrentLoad()) return;
       sizeRows.push(...(sizeResult.data || [])); approvalRows.push(...(approvalResult.data || [])); designRows.push(...(designResult.data || []));
     }
     const mappedRecords = await Promise.all((rawRecords || []).map(async row => {
       const [designImage, logoDataUrl] = await Promise.all([
-        row.design_storage_path ? signPath(row.design_storage_path).catch(() => "") : "",
-        row.selected_logo_storage_path ? signPath(row.selected_logo_storage_path).catch(() => "") : ""
+        row.design_storage_path ? signPath(row.design_storage_path).catch(() => { signedUrlFailures++; return ""; }) : "",
+        row.selected_logo_storage_path ? signPath(row.selected_logo_storage_path).catch(() => { signedUrlFailures++; return ""; }) : ""
       ]);
       return {
         id: row.id, spkNo: row.spk_no, createdAt: Date.parse(row.created_at), updatedAt: row.updated_at,
@@ -184,18 +238,20 @@
       };
     }));
 
-    const { data: logoRows, error: logoError } = await client.from("company_logos").select("id,workspace_id,slot,label,storage_path,version,is_active").eq("workspace_id", workspaceId).eq("is_active", true).order("slot");
+    if (!isCurrentLoad()) return;
+    const { data: logoRows, error: logoError } = await client.from("company_logos").select("id,workspace_id,slot,label,storage_path,version,is_active").eq("workspace_id", loadWorkspaceId).eq("is_active", true).order("slot");
     if (logoError) throw logoError;
     const mappedLogos = await Promise.all((logoRows || []).map(async row => ({
-      id: row.id, label: row.label, dataUrl: row.storage_path ? await signPath(row.storage_path) : "",
+      id: row.id, label: row.label, dataUrl: row.storage_path ? await signPath(row.storage_path).catch(() => { signedUrlFailures++; return ""; }) : "",
       storagePath: row.storage_path, version: row.version, slot: row.slot, active: row.is_active
     })));
 
-    // Cloud data replaces the active browser cache only after all server reads succeed.
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(mappedRecords));
-    localStorage.setItem(LOGO_KEY, JSON.stringify(mappedLogos));
-    emit("loaded", { workspaceId, workspaceName, count: mappedRecords.length, logos: mappedLogos.length });
-    status(`${mappedRecords.length} SPK dimuat dari “${workspaceName}”.`);
+    // Cloud data replaces the active browser cache only after all server reads succeed and the account/workspace is still current.
+    if (!isCurrentLoad()) return;
+    setActiveCache(mappedRecords, mappedLogos, "cloud");
+    status(signedUrlFailures
+      ? `${mappedRecords.length} SPK dimuat dari “${workspaceName}”; ${signedUrlFailures} gambar belum bisa dibuka. Muat ulang arsip untuk mencoba lagi.`
+      : `${mappedRecords.length} SPK dimuat dari “${workspaceName}”.`);
     $("#migrateLocalBtn")?.classList.toggle("hidden", safeJson(MIGRATION_RECORDS_KEY, []).length === 0);
     updateRoleControls();
   }
@@ -207,13 +263,15 @@
     return data;
   }
 
-  async function saveRecord(data) {
+  async function saveRecord(data, expectedContext = {}) {
     if (!isActive()) throw new Error("Login dan pilih workspace sebelum menyimpan ke server.");
+    const context = captureWorkspaceContext(expectedContext);
     const recordId = data.id || `spk-${crypto.randomUUID()}`;
     let designPath = data.designStoragePath || null;
     let designBlob = null;
     if (typeof data.designImage === "string" && data.designImage.startsWith("data:image/")) {
-      const uploaded = await uploadDataUrl(data.designImage, `spk/${recordId}`);
+      const uploaded = await uploadDataUrl(data.designImage, `spk/${recordId}`, context.workspaceId);
+      assertWorkspaceContext(context);
       designPath = uploaded.path;
       designBlob = uploaded.blob;
     } else if (!data.designImage && !data.designStoragePath) {
@@ -222,7 +280,8 @@
 
     let logoSnapshot = data.selectedLogoSnapshot ? { ...data.selectedLogoSnapshot } : null;
     if (logoSnapshot && typeof logoSnapshot.dataUrl === "string" && logoSnapshot.dataUrl.startsWith("data:image/")) {
-      const uploaded = await uploadDataUrl(logoSnapshot.dataUrl, `spk/${recordId}/logo-snapshot`);
+      const uploaded = await uploadDataUrl(logoSnapshot.dataUrl, `spk/${recordId}/logo-snapshot`, context.workspaceId);
+      assertWorkspaceContext(context);
       logoSnapshot.storagePath = uploaded.path;
     }
     const sizes = (data.sizes || []).map(item => ({ category: String(item.category || "dewasa-pendek"), size: String(item.size || ""), quantity: Math.max(0, Number.parseInt(item.value ?? item.quantity ?? 0, 10) || 0) }));
@@ -231,7 +290,7 @@
       { type: "customer", name: data.apCustomer || "" }, { type: "production", name: data.apProduction || "" }
     ];
     const payload = {
-      id: recordId, workspace_id: workspaceId, spk_no: data.spkNo || await nextSpkNumber(), base_version: Number(data.version) || 0,
+      id: recordId, workspace_id: context.workspaceId, spk_no: data.spkNo || await nextSpkNumber(), base_version: Number(data.version) || 0,
       customer: String(data.customer || "").trim(), order_name: String(data.order || "").trim(), order_date: data.orderDate || null,
       deadline: data.deadline || null, model_kerah: data.modelKerah || "", material: data.material || "", colour: data.colour || "",
       quantity: sizes.reduce((sum, item) => sum + item.quantity, 0), notes: data.notes || "",
@@ -241,8 +300,10 @@
       design_file_name: "design", design_mime_type: designBlob?.type || data.designMimeType || "image/jpeg", design_file_size: designBlob?.size || Number(data.designFileSize) || 1,
       sizes, approvals
     };
-    const { data: serverRow, error } = await client.rpc("save_spk", { p_payload: payload });
+    assertWorkspaceContext(context);
+    const { data: serverRow, error } = await context.client.rpc("save_spk", { p_payload: payload });
     if (error) throw error;
+    assertWorkspaceContext(context);
     let designUrl = "";
     if (designPath) { try { designUrl = await signPath(designPath); } catch { designUrl = typeof data.designImage === "string" && data.designImage.startsWith("data:image/") ? data.designImage : ""; } }
     if (logoSnapshot?.storagePath) { try { logoSnapshot.dataUrl = await signPath(logoSnapshot.storagePath); } catch { /* Server save succeeded; keep the metadata and let reload retry the signed URL. */ } }
@@ -258,8 +319,10 @@
 
   async function deleteRecord(id) {
     if (!isActive()) throw new Error("Tidak ada workspace cloud aktif.");
-    const { error } = await client.rpc("delete_spk", { p_id: String(id) });
+    const context = captureWorkspaceContext();
+    const { error } = await context.client.rpc("delete_spk", { p_id: String(id) });
     if (error) throw error;
+    assertWorkspaceContext(context);
   }
 
   async function refreshMembers() {
@@ -278,7 +341,7 @@
       remove.disabled = member.user_id === session.user.id && (data || []).filter(m => m.role === "admin" && m.status === "active").length < 2;
       remove.addEventListener("click", async () => {
         if (!confirm("Keluarkan anggota ini dari workspace? Aksesnya akan dihentikan.")) return;
-        try { const result = await client.rpc("remove_workspace_member", { p_workspace_id: workspaceId, p_user_id: member.user_id }); if (result.error) throw result.error; await refreshMembers(); status("Daftar anggota diperbarui."); }
+        try { const context = captureWorkspaceContext(); const result = await context.client.rpc("remove_workspace_member", { p_workspace_id: context.workspaceId, p_user_id: member.user_id }); if (result.error) throw result.error; assertWorkspaceContext(context); await refreshMembers(); status("Daftar anggota diperbarui."); }
         catch (e) { status(errorMessage(e), true); }
       });
       row.append(details, remove); container.append(row);
@@ -294,31 +357,48 @@
   }
 
   async function activateWorkspace(id) {
-    if (switchingWorkspace) return;
+    const activation = ++activationGeneration;
+    const activationEpoch = sessionEpoch;
     switchingWorkspace = true;
     try {
       captureLocalSnapshot();
       const membership = memberships.find(item => item.workspace_id === id);
       if (!membership) throw new Error("Workspace tidak ada dalam daftar keanggotaan akun ini.");
+      const sameWorkspace = workspaceId === membership.workspace_id && session?.user?.id === activeUserId;
       workspaceId = membership.workspace_id;
       currentRole = membership.role;
       workspaceName = membership.workspaces?.name || "Workspace";
+      localStorage.setItem(workspacePreferenceKey(session.user.id), workspaceId);
       document.body.classList.add("cloud-configured", "cloud-active");
       showAccountUI();
       $("#activeWorkspaceName") && ( $("#activeWorkspaceName").textContent = `${workspaceName} · ${currentRole}` );
+      if (!sameWorkspace) clearActiveCache("cloud");
       await loadWorkspaceData();
+      if (activation !== activationGeneration || activationEpoch !== sessionEpoch || !isActive()) return;
       if (isAdmin()) await refreshMembers();
-      if (window.SpkApp?.startNew) window.SpkApp.startNew(false);
+      if (!sameWorkspace && window.SpkApp?.startNew) {
+        window.SpkApp.startNew(false, { preserveDraft: true });
+        await window.SpkApp.restoreDraft?.();
+      }
     } catch (error) {
-      workspaceId = null;
-      document.body.classList.remove("cloud-active");
-      status(errorMessage(error), true);
-    } finally { switchingWorkspace = false; showAccountUI(); }
+      if (activation === activationGeneration && activationEpoch === sessionEpoch) {
+        workspaceId = null;
+        document.body.classList.remove("cloud-active");
+        clearActiveCache("cloud");
+        status(errorMessage(error), true);
+      }
+    } finally {
+      if (activation === activationGeneration) { switchingWorkspace = false; showAccountUI(); }
+    }
   }
 
-  async function loadMemberships() {
+  async function loadMemberships(options = {}) {
+    if (!session?.user?.id) return;
+    const userId = session.user.id;
+    const requestEpoch = sessionEpoch;
     const { data, error } = await client.from("workspace_members").select("workspace_id,role,status,created_at,workspaces(id,name)").eq("user_id", session.user.id).eq("status", "active").order("created_at");
     if (error) throw error;
+    if (requestEpoch !== sessionEpoch || userId !== session?.user?.id) return;
     memberships = data || [];
     const select = $("#workspaceSelect");
     if (select) {
@@ -329,22 +409,56 @@
       select.disabled = memberships.length < 2;
     }
     showAccountUI();
-    if (memberships.length) await activateWorkspace(memberships[0].workspace_id);
-    else status("Akun sudah login, tetapi belum memiliki workspace. Buat workspace untuk mulai menyimpan SPK di server.");
+    if (memberships.length) {
+      const storedWorkspace = localStorage.getItem(workspacePreferenceKey(userId));
+      const currentIsMember = memberships.some(item => item.workspace_id === workspaceId);
+      const preferred = memberships.find(item => item.workspace_id === storedWorkspace);
+      const selected = preferred || (options.keepCurrent && currentIsMember ? memberships.find(item => item.workspace_id === workspaceId) : null) || memberships[0];
+      if (options.keepCurrent && currentIsMember && selected.workspace_id === workspaceId) {
+        currentRole = selected.role;
+        workspaceName = selected.workspaces?.name || "Workspace";
+        $("#activeWorkspaceName") && ( $("#activeWorkspaceName").textContent = `${workspaceName} · ${currentRole}` );
+        showAccountUI();
+        await loadWorkspaceData();
+        if (isAdmin()) await refreshMembers();
+      } else await activateWorkspace(selected.workspace_id);
+    } else {
+      workspaceId = null; currentRole = "member"; workspaceName = "";
+      clearActiveCache("cloud");
+      status("Akun ini belum menjadi anggota workspace. Minta admin menambahkan UUID akun ini, lalu pilih Muat ulang workspace.");
+    }
   }
 
-  async function handleSession(nextSession) {
+  async function handleSession(nextSession, refreshMembership = false) {
+    const nextUserId = nextSession?.user?.id || null;
+    const identityChanged = nextUserId !== activeUserId;
+    if (!identityChanged && !refreshMembership) {
+      session = nextSession;
+      showAccountUI();
+      return;
+    }
+    if (identityChanged) {
+      captureLocalSnapshot();
+      sessionEpoch++;
+      activationGeneration++;
+      workspaceLoadGeneration++;
+      activeUserId = nextUserId;
+      workspaceId = null; memberships = []; currentRole = "member"; workspaceName = "";
+      clearActiveCache(nextUserId ? "cloud" : "local");
+    }
     session = nextSession;
     showAccountUI();
     if (!session) {
-      workspaceId = null; memberships = []; currentRole = "member"; workspaceName = "";
       document.body.classList.remove("cloud-active");
+      restoreLocalSnapshot();
+      window.SpkApp?.startNew?.(false, { preserveDraft: true });
+      await window.SpkApp?.restoreDraft?.();
       status("Login diperlukan untuk membuka arsip cloud. Data lokal di browser tidak dihapus.");
       return;
     }
     try {
       status(`Login sebagai ${session.user.email}. Memeriksa workspace…`);
-      await loadMemberships();
+      await loadMemberships({ keepCurrent: !identityChanged });
     } catch (error) { status(errorMessage(error), true); }
   }
 
@@ -357,8 +471,7 @@
       try {
         const { data, error } = await client.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        session = data.session;
-        await handleSession(session);
+        status(`Login berhasil sebagai ${data.user?.email || email}. Memeriksa workspace…`);
       } catch (error) { status(errorMessage(error), true); }
       finally { if (button) button.disabled = false; }
     });
@@ -368,7 +481,7 @@
       try {
         const { data, error } = await client.auth.signUp({ email, password, options: { emailRedirectTo: `${location.origin}${location.pathname}`, data: { display_name: email.split("@")[0] } } });
         if (error) throw error;
-        if (data.session) await handleSession(data.session); else status("Pendaftaran diterima. Periksa email untuk konfirmasi, lalu login.");
+        if (!data.session) status("Pendaftaran diterima. Periksa email untuk konfirmasi, lalu login.");
       } catch (error) { status(errorMessage(error), true); }
     });
     $("#resetPasswordBtn")?.addEventListener("click", async () => {
@@ -381,7 +494,7 @@
       } catch (error) { status(errorMessage(error), true); }
     });
     $("#signOutBtn")?.addEventListener("click", async () => {
-      try { const { error } = await client.auth.signOut(); if (error) throw error; session = null; await handleSession(null); }
+      try { const { error } = await client.auth.signOut(); if (error) throw error; }
       catch (error) { status(errorMessage(error), true); }
     });
     $("#createWorkspaceBtn")?.addEventListener("click", async () => {
@@ -395,12 +508,21 @@
       } catch (error) { status(errorMessage(error), true); }
     });
     $("#workspaceSelect")?.addEventListener("change", async event => activateWorkspace(event.target.value));
+    $("#refreshWorkspaceBtn")?.addEventListener("click", async () => {
+      const button = $("#refreshWorkspaceBtn");
+      if (button) button.disabled = true;
+      try { await loadMemberships({ keepCurrent: true }); }
+      catch (error) { status(errorMessage(error), true); }
+      finally { if (button) button.disabled = false; }
+    });
     $("#addMemberBtn")?.addEventListener("click", async () => {
       const userId = $("#memberUserId").value.trim(); const role = $("#memberRole").value;
       if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId)) { status("Masukkan UUID pengguna yang valid. Pengguna harus mendaftar lebih dahulu.", true); return; }
       try {
-        const { error } = await client.rpc("add_workspace_member", { p_workspace_id: workspaceId, p_user_id: userId, p_role: role });
+        const context = captureWorkspaceContext();
+        const { error } = await context.client.rpc("add_workspace_member", { p_workspace_id: context.workspaceId, p_user_id: userId, p_role: role });
         if (error) throw error;
+        assertWorkspaceContext(context);
         $("#memberUserId").value = ""; await refreshMembers(); status("Anggota workspace ditambahkan/diperbarui.");
       } catch (error) { status(errorMessage(error), true); }
     });
@@ -517,9 +639,27 @@
         auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
       });
       client.auth.onAuthStateChange((event, nextSession) => {
-        session = nextSession;
+        // A token refresh must not reload the workspace or reset the active form.
+        if (event === "INITIAL_SESSION") return;
+        const nextUserId = nextSession?.user?.id || null;
+        const identityChanged = nextUserId !== activeUserId;
+        if (identityChanged) {
+          captureLocalSnapshot();
+          void window.SpkApp?.preserveCurrentDraft?.().catch(error => console.warn("Could not preserve draft before account switch", error));
+          session = null;
+          workspaceId = null; memberships = []; currentRole = "member"; workspaceName = "";
+          document.body.classList.remove("cloud-active");
+          clearActiveCache(nextSession ? "cloud" : "local");
+          window.SpkApp?.startNew?.(false, { preserveDraft: true });
+        }
         if (event === "PASSWORD_RECOVERY") recoveryMode = true;
-        setTimeout(() => handleSession(nextSession), 0);
+        if (event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+          session = nextSession;
+          showAccountUI();
+          if (identityChanged) setTimeout(() => { void handleSession(nextSession, true); }, 0);
+          return;
+        }
+        setTimeout(() => { void handleSession(nextSession, event === "SIGNED_IN" || event === "SIGNED_OUT"); }, 0);
       });
       const { data, error } = await client.auth.getSession();
       if (error) throw error;
@@ -528,8 +668,9 @@
   }
 
   window.SpkCloud = {
-    init, configured, isActive, isAdmin, getWorkspaceId: () => workspaceId, getRole: () => currentRole,
+    init, configured, isActive, isAdmin, getWorkspaceId: () => workspaceId, getUserId: () => session?.user?.id || null, getRole: () => currentRole,
     saveRecord, deleteRecord, saveLogo, deleteLogo, nextSpkNumber, importRecords, exportBackup,
+    signPath,
     getClient: () => client,
     errorMessage,
     refresh: loadWorkspaceData
@@ -537,3 +678,5 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })();
+
+

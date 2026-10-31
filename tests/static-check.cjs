@@ -15,6 +15,7 @@ const script = read('script.js');
 const cloud = read('cloud.js');
 const config = read('config.js');
 const build = read('build-config.cjs');
+const migration = read('supabase/migrations/20261028074039_initial_spk_generator_schema.sql');
 const pkg = JSON.parse(read('package.json'));
 
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
@@ -61,6 +62,23 @@ for (const table of ['company_logos', 'spk_records', 'spk_sizes', 'spk_approvals
   assert.ok(cloud.includes(table), 'Supabase table reference is missing: ' + table);
 }
 assert.match(cloud, /spk-files/, 'Expected private Supabase Storage bucket reference is missing');
+assert.match(html, /id="refreshWorkspaceBtn"/, 'Workspace membership refresh control is missing');
+assert.match(cloud, /ACTIVE_WORKSPACE_KEY/, 'Selected workspace must be remembered per account');
+assert.match(cloud, /event === "TOKEN_REFRESHED"[\s\S]*?return;/, 'Token refresh must not reload memberships or reset the editor');
+assert.match(cloud, /CACHE_SOURCE_KEY/, 'Local records and the cloud cache must not be mixed between accounts');
+assert.match(cloud, /assertWorkspaceContext\(context\)/, 'Cloud writes must reject account or workspace switches in flight');
+assert.match(cloud, /workspaceLoadGeneration === loadGeneration/, 'Stale workspace loads must not replace the active cache');
+assert.match(script, /window\.indexedDB\.open/, 'Form drafts need durable browser recovery storage');
+assert.match(script, /window\.addEventListener\("pagehide"/, 'Draft recovery must flush when the page closes');
+assert.match(script, /persistedFormRevision/, 'Concurrent autosaves must not replay an unchanged form or lose newer edits');
+assert.match(script, /Number\(currentRecordVersion \|\| saved\[index\]\.version \|\| 0\)/,
+  'A refreshed cloud cache must not replace the version captured by an already-open form');
+assert.match(script, /window\.SpkCloud\.saveRecord\(data, \{ workspaceId: snapshot\.workspaceId, userId: snapshot\.userId \}\)/,
+  'Cloud saves must be bound to the workspace and account that started the save');
+assert.match(migration, /create policy "workspace members can read SPK records"[\s\S]*?private\.is_workspace_member\(workspace_id\)/,
+  'SPK record reads must remain restricted to active workspace membership');
+assert.match(migration, /values \('spk-files', 'spk-files', false, 15728640\)/,
+  'SPK Storage must remain private with its configured size limit');
 
 for (const source of [html, script, cloud, config, build]) {
   assert.doesNotMatch(source, /service_role\s*[:=]\s*['"]|sb_secret_[A-Za-z0-9_-]+/i,
@@ -71,4 +89,6 @@ assert.match(build, /SUPABASE_URL/, 'Build must read SUPABASE_URL');
 assert.match(build, /SUPABASE_ANON_KEY/, 'Build must read SUPABASE_ANON_KEY');
 assert.equal(pkg.scripts?.build, 'node build-config.cjs', 'Unexpected build command');
 
-console.log('Static checks passed: HTML IDs, client selectors, asset order, print CSS, Supabase references, and public-key safety.');
+console.log('Static checks passed: UI selectors, print layout, workspace isolation, autosave recovery, and private Supabase access.');
+
+

@@ -41,7 +41,7 @@
     <div id="accountControls" class="hidden">
       <div class="account-summary"><div><span class="muted-label">Login sebagai</span><strong id="signedInEmail"></strong><span class="muted-label">UUID akun (bagikan ke admin workspace)</span><code id="signedInId"></code></div><button class="btn small" id="copyUserIdBtn" type="button">Salin UUID</button><button class="btn small" id="signOutBtn" type="button">Logout</button></div>
       <div id="workspaceSetup" class="workspace-setup hidden"><label>Nama workspace baru<input id="newWorkspaceName" maxlength="120" placeholder="Contoh: UNITEE Produksi"></label><button class="btn primary" id="createWorkspaceBtn" type="button">Buat workspace dan jadikan admin</button></div>
-      <div id="workspaceControls" class="workspace-controls hidden"><label>Workspace aktif<select id="workspaceSelect"></select></label><strong id="activeWorkspaceName"></strong><div class="workspace-actions"><button class="btn" id="migrateLocalBtn" type="button">Migrasikan arsip lokal ke cloud</button><span class="hint">Data lokal asli dipertahankan sebagai cadangan browser.</span></div>
+      <div id="workspaceControls" class="workspace-controls hidden"><label>Workspace aktif<select id="workspaceSelect"></select></label><strong id="activeWorkspaceName"></strong><div class="workspace-actions"><button class="btn" id="refreshWorkspaceBtn" type="button">Muat ulang workspace</button><button class="btn" id="migrateLocalBtn" type="button">Migrasikan arsip lokal ke cloud</button><span class="hint">Akun lain perlu ditambahkan admin sebagai anggota workspace. Muat ulang workspace setelah undangan dibuat.</span><span class="hint">Data lokal asli dipertahankan sebagai cadangan browser.</span></div>
         <section id="memberAdminPanel" class="member-admin hidden"><h3>Anggota workspace</h3><p class="hint">Anggota harus mendaftar terlebih dahulu. Minta UUID akun mereka, lalu tambahkan di sini. RLS tetap memeriksa izin di database.</p><div class="member-add"><label>UUID pengguna<input id="memberUserId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off"></label><label>Peran<select id="memberRole"><option value="member">Anggota</option><option value="admin">Admin</option></select></label><button class="btn primary" id="addMemberBtn" type="button">Tambah / ubah</button></div><div id="memberList" class="member-list"></div></section>
       </div>
     </div>
@@ -162,3 +162,5 @@
   <script src="script.js" defer></script>
 </body>
 </html>
+
+

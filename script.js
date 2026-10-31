@@ -5,6 +5,8 @@ const $$ = selector => [...document.querySelectorAll(selector)];
 const STORAGE_KEY = "spk_generator_data_v3";
 const LOGO_STORAGE_KEY = "spk_generator_logos_v1";
 const LOGO_COUNT = 4;
+const DRAFT_DATABASE = "spk_generator_drafts_v1";
+const DRAFT_STORE = "drafts";
 let selectedLogoId = null;
 let currentLogoSnapshot = null;
 const categories = [
@@ -28,6 +30,125 @@ let toastTimer = null;
 let autoSaveTimer = null;
 let storageReadFailed = false;
 let currentSpkNo = generateSpkNo();
+let draftDatabasePromise = null;
+let draftWriteQueue = Promise.resolve();
+let draftDirty = false;
+let formRevision = 0;
+let persistedFormRevision = 0;
+let formGeneration = 0;
+
+function draftScopeKey() {
+  const userId = window.SpkCloud?.getUserId?.();
+  const workspaceId = window.SpkCloud?.getWorkspaceId?.();
+  return userId ? `cloud:${userId}:${workspaceId || "no-workspace"}` : "local";
+}
+
+function currentDraftKey() {
+  const recordId = currentRecordId === null ? "new" : `record:${encodeURIComponent(String(currentRecordId))}`;
+  return `${draftScopeKey()}:draft:${recordId}`;
+}
+
+function activeDraftPointerKey() { return `${draftScopeKey()}:active`; }
+
+function openDraftDatabase() {
+  if (draftDatabasePromise) return draftDatabasePromise;
+  if (!window.indexedDB) return Promise.reject(new Error("Browser tidak mendukung pemulihan draft."));
+  draftDatabasePromise = new Promise((resolve, reject) => {
+    const request = window.indexedDB.open(DRAFT_DATABASE, 1);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(DRAFT_STORE)) request.result.createObjectStore(DRAFT_STORE, { keyPath: "key" });
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error("Penyimpanan draft gagal dibuka."));
+    request.onblocked = () => reject(new Error("Penyimpanan draft sedang dipakai tab lain."));
+  });
+  return draftDatabasePromise;
+}
+
+function writeDraft(operation) {
+  draftWriteQueue = draftWriteQueue.catch(() => {}).then(async () => {
+    const db = await openDraftDatabase();
+    await new Promise((resolve, reject) => {
+      const transaction = db.transaction(DRAFT_STORE, "readwrite");
+      operation(transaction.objectStore(DRAFT_STORE));
+      transaction.oncomplete = resolve;
+      transaction.onerror = () => reject(transaction.error || new Error("Draft gagal disimpan."));
+      transaction.onabort = () => reject(transaction.error || new Error("Penyimpanan draft dibatalkan."));
+    });
+  });
+  return draftWriteQueue;
+}
+
+function readDraft(key) {
+  return openDraftDatabase().then(db => new Promise((resolve, reject) => {
+    const request = db.transaction(DRAFT_STORE, "readonly").objectStore(DRAFT_STORE).get(key);
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error || new Error("Draft gagal dibaca."));
+  }));
+}
+
+async function saveCurrentDraft(revision = formRevision) {
+  const data = collectForm();
+  const scope = draftScopeKey();
+  const key = currentDraftKey();
+  await writeDraft(store => {
+    if (revision !== formRevision) return;
+    store.put({ key, data, updatedAt: Date.now() });
+    store.put({ key: `${scope}:active`, draftKey: key, updatedAt: Date.now() });
+  });
+  if (revision === formRevision) draftDirty = true;
+}
+
+async function clearCurrentDraft() {
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = null;
+  const scope = draftScopeKey();
+  const key = currentDraftKey();
+  formRevision++;
+  persistedFormRevision = formRevision;
+  draftDirty = false;
+  try {
+    await writeDraft(store => {
+      const pointerKey = `${scope}:active`;
+      const pointer = store.get(pointerKey);
+      pointer.onsuccess = () => {
+        if (pointer.result?.draftKey) store.delete(pointer.result.draftKey);
+        store.delete(pointerKey);
+      };
+      store.delete(key);
+    });
+  } catch (error) { console.warn("Could not clear saved draft", error); }
+}
+
+async function restoreDraft() {
+  const scope = draftScopeKey();
+  try {
+    const pointer = await readDraft(`${scope}:active`);
+    if (!pointer?.draftKey) return false;
+    const draft = await readDraft(pointer.draftKey);
+    if (!draft?.data || typeof draft.data !== "object") return false;
+    const record = { ...draft.data };
+    if (window.SpkCloud?.isActive()) {
+      if (record.designStoragePath && !record.designImage?.startsWith("data:image/")) {
+        record.designImage = await window.SpkCloud.signPath(record.designStoragePath).catch(() => record.designImage || "");
+      }
+      const snapshot = record.selectedLogoSnapshot;
+      if (snapshot?.storagePath && !snapshot.dataUrl?.startsWith("data:image/")) {
+        snapshot.dataUrl = await window.SpkCloud.signPath(snapshot.storagePath).catch(() => snapshot.dataUrl || "");
+      }
+    }
+    applyForm(record, { preserveDraft: true });
+    draftDirty = true;
+    formRevision++;
+    persistedFormRevision = formRevision - 1;
+    toast("Draft terakhir dipulihkan otomatis.");
+    return true;
+  } catch (error) {
+    console.warn("Could not restore saved draft", error);
+    toast("Draft sebelumnya tidak dapat dipulihkan dari penyimpanan browser.", "error");
+    return false;
+  }
+}
 
 function toast(message, type = "") {
   const element = $("#toast");
@@ -217,15 +338,17 @@ function collectForm() {
 
 async function persistCurrent(showMessage = false) {
   if (persistPromise) {
-    await persistPromise;
-    return persistCurrent(showMessage);
+    const result = await persistPromise;
+    if (formRevision > persistedFormRevision) return persistCurrent(showMessage);
+    return result;
   }
-  persistPromise = persistCurrentInternal(showMessage);
+  const snapshot = { revision: formRevision, generation: formGeneration, recordId: currentRecordId, workspaceId: window.SpkCloud?.getWorkspaceId?.() || null, userId: window.SpkCloud?.getUserId?.() || null };
+  persistPromise = persistCurrentInternal(showMessage, snapshot);
   try { return await persistPromise; }
   finally { persistPromise = null; }
 }
 
-async function persistCurrentInternal(showMessage = false) {
+async function persistCurrentInternal(showMessage = false, snapshot = { revision: formRevision, generation: formGeneration, recordId: currentRecordId }) {
   const error = validateForm();
   if (error) { if (showMessage) toast(error, "error"); return false; }
   if (window.SpkCloud?.isActive() && currentRecordId === null && !spkNumberReady) {
@@ -236,8 +359,10 @@ async function persistCurrentInternal(showMessage = false) {
   const saved = getSaved();
   if (storageReadFailed) return false;
   const data = collectForm();
-  const index = currentRecordId === null ? -1 : saved.findIndex(item => String(item.id) === String(currentRecordId));
-  if (currentRecordId !== null && index < 0) {
+  const recordIdAtStart = currentRecordId;
+  const formGenerationAtStart = snapshot.generation;
+  const index = recordIdAtStart === null ? -1 : saved.findIndex(item => String(item.id) === String(recordIdAtStart));
+  if (recordIdAtStart !== null && index < 0) {
     if (showMessage) toast("SPK ini tidak lagi ditemukan di arsip. Gunakan SPK Baru untuk menyimpan sebagai dokumen baru.", "error");
     return false;
   }
@@ -246,10 +371,10 @@ async function persistCurrentInternal(showMessage = false) {
   if (window.SpkCloud?.isActive()) {
     try {
       data.id = isUpdate ? saved[index].id : createRecordId(saved);
-      data.version = isUpdate ? Number(saved[index].version || currentRecordVersion || 0) : 0;
+      // Keep the version captured when this form was opened. A refreshed cache must not make stale edits overwrite a teammate's change.
+      data.version = isUpdate ? Number(currentRecordVersion || saved[index].version || 0) : 0;
       if (isUpdate) data.spkNo = saved[index].spkNo || currentSpkNo;
-      const serverRecord = await window.SpkCloud.saveRecord(data);
-      if (serverRecord.designImage) designSlot.setImage(serverRecord.designImage, false, serverRecord.designStoragePath || null, serverRecord.designFileSize, serverRecord.designMimeType);
+      const serverRecord = await window.SpkCloud.saveRecord(data, { workspaceId: snapshot.workspaceId, userId: snapshot.userId });
       const next = getSaved();
       if (storageReadFailed) throw new Error("Cache arsip lokal tidak dapat dibaca setelah server menyimpan SPK.");
       const existingIndex = next.findIndex(item => String(item.id) === String(serverRecord.id));
@@ -259,13 +384,23 @@ async function persistCurrentInternal(showMessage = false) {
         await window.SpkCloud.refresh();
         throw new Error("SPK tersimpan di server, tetapi cache browser gagal diperbarui. Arsip server dimuat ulang; periksa ruang penyimpanan browser.");
       }
-      currentRecordId = serverRecord.id;
-      currentCreatedAt = serverRecord.createdAt;
-      currentRecordVersion = Number(serverRecord.version) || 1;
-      currentDesignStoragePath = serverRecord.designStoragePath || null;
-      currentSpkNo = serverRecord.spkNo;
-      if (serverRecord.selectedLogoSnapshot) currentLogoSnapshot = serverRecord.selectedLogoSnapshot;
-      paintSpkNo(); renderSaved(); updatePrintDate(); updateDocumentLogo();
+      persistedFormRevision = Math.max(persistedFormRevision, snapshot.revision);
+      if (formGeneration === formGenerationAtStart && String(currentRecordId) === String(recordIdAtStart)) {
+        currentRecordId = serverRecord.id;
+        currentCreatedAt = serverRecord.createdAt;
+        currentRecordVersion = Number(serverRecord.version) || 1;
+        currentSpkNo = serverRecord.spkNo;
+        if (formRevision === snapshot.revision) {
+          if (serverRecord.designImage) designSlot.setImage(serverRecord.designImage, false, serverRecord.designStoragePath || null, serverRecord.designFileSize, serverRecord.designMimeType);
+          currentDesignStoragePath = serverRecord.designStoragePath || null;
+          currentDesignFileSize = Number(serverRecord.designFileSize) || 0;
+          currentDesignMimeType = serverRecord.designMimeType || "image/jpeg";
+          if (serverRecord.selectedLogoSnapshot) currentLogoSnapshot = serverRecord.selectedLogoSnapshot;
+          await clearCurrentDraft();
+        }
+        paintSpkNo(); updatePrintDate(); updateDocumentLogo();
+      }
+      renderSaved();
       if (showMessage) toast(isUpdate ? "SPK berhasil diperbarui di server." : "SPK berhasil disimpan di server.");
       return true;
     } catch (cloudError) {
@@ -291,30 +426,44 @@ async function persistCurrentInternal(showMessage = false) {
     saved.push(data);
   }
   if (!setSaved(saved)) return false;
-  currentRecordId = data.id;
-  currentCreatedAt = data.createdAt;
-  currentRecordVersion = data.version;
-  currentDesignStoragePath = data.designStoragePath || null;
-  currentSpkNo = data.spkNo;
-  paintSpkNo(); renderSaved(); updatePrintDate();
+  persistedFormRevision = Math.max(persistedFormRevision, snapshot.revision);
+  if (formGeneration === formGenerationAtStart && String(currentRecordId) === String(recordIdAtStart)) {
+    currentRecordId = data.id;
+    currentCreatedAt = data.createdAt;
+    currentRecordVersion = data.version;
+    currentDesignStoragePath = data.designStoragePath || null;
+    currentSpkNo = data.spkNo;
+    paintSpkNo(); updatePrintDate();
+    if (formRevision === snapshot.revision) await clearCurrentDraft();
+  }
+  renderSaved();
   if (showMessage) toast(isUpdate ? "SPK berhasil diperbarui." : "SPK baru berhasil disimpan.");
   return true;
 }
 
 function scheduleAutoSave() {
   clearTimeout(autoSaveTimer);
-
-  // Draft baru hanya masuk arsip saat pengguna menyimpan atau mencetaknya.
-  if (currentRecordId === null) return;
-
+  const revision = ++formRevision;
   autoSaveTimer = setTimeout(() => {
-    if (validateForm()) return;
-    persistCurrent(false).catch(error => { console.error(error); toast("Penyimpanan otomatis gagal.", "error"); });
+    void (async () => {
+      try { await saveCurrentDraft(revision); }
+      catch (error) { console.error("Draft recovery save failed", error); toast("Pemulihan draft gagal disimpan di browser.", "error"); }
+      if (currentRecordId !== null && !validateForm()) {
+        try { await persistCurrent(false); }
+        catch (error) { console.error(error); toast("Penyimpanan otomatis gagal.", "error"); }
+      }
+    })();
   }, 500);
 }
 
-function applyForm(record) {
+function applyForm(record, options = {}) {
+  if (!options.preserveDraft && draftDirty && !confirm("Formulir memiliki perubahan yang belum tersimpan. Buang perubahan ini dan buka SPK lain?")) return false;
   clearTimeout(autoSaveTimer);
+  formGeneration++;
+  formRevision++;
+  persistedFormRevision = formRevision;
+  if (!options.preserveDraft) void clearCurrentDraft();
+  draftDirty = Boolean(options.preserveDraft);
   currentRecordId = record.id ?? null;
   currentSpkNo = record.spkNo || generateSpkNo();
   currentCreatedAt = getCreatedTimestamp(record) || null;
@@ -376,6 +525,7 @@ function applyForm(record) {
   $("#pApProduction").textContent = $("#apProduction").value;
   updateSizes();
   updatePrintDate();
+  return true;
 }
 
 function escapeHtml(value) {
@@ -773,8 +923,13 @@ function setDefaultDates() {
   syncDates();
 }
 
-function startNewSpk(showMessage = true) {
+function startNewSpk(showMessage = true, options = {}) {
   clearTimeout(autoSaveTimer);
+  formGeneration++;
+  const generation = formGeneration;
+  formRevision++;
+  persistedFormRevision = formRevision;
+  if (!options.preserveDraft) void clearCurrentDraft();
   currentRecordId = null;
   currentCreatedAt = null;
   currentRecordVersion = 0;
@@ -821,7 +976,7 @@ function startNewSpk(showMessage = true) {
     currentSpkNo = "Menyiapkan nomor…";
     paintSpkNo();
     window.SpkCloud.nextSpkNumber().then(number => {
-      if (currentRecordId === null) { currentSpkNo = number; spkNumberReady = true; paintSpkNo(); }
+      if (currentRecordId === null && formGeneration === generation) { currentSpkNo = number; spkNumberReady = true; paintSpkNo(); }
     }).catch(error => { spkNumberReady = false; toast(window.SpkCloud.errorMessage(error), "error"); });
   }
   if (showMessage) toast("Formulir SPK baru siap digunakan.");
@@ -864,6 +1019,10 @@ renderSaved();
 
 window.SpkApp = {
   startNew: startNewSpk,
+  restoreDraft,
+  preserveCurrentDraft() {
+    return draftDirty || formRevision > persistedFormRevision ? saveCurrentDraft(formRevision) : Promise.resolve();
+  },
   setRecordNumber(number) {
     if (currentRecordId !== null) return;
     currentSpkNo = String(number || generateSpkNo()); spkNumberReady = true; paintSpkNo();
@@ -877,6 +1036,15 @@ window.addEventListener("spkcloud:loaded", () => {
   if (current) { selectedLogoId = current.id; currentLogoSnapshot = logoSnapshot(current); }
   updateDocumentLogo(); updatePrintDate();
 });
+
+window.addEventListener("pagehide", () => {
+  if (draftDirty || formRevision > persistedFormRevision) {
+    const revision = formRevision;
+    void saveCurrentDraft(revision).catch(error => console.warn("Could not save draft before page close", error));
+  }
+});
+
+if (!window.SpkCloud?.configured?.()) void restoreDraft();
 
 $$(".editor input, .editor textarea, .editor select").forEach(field => {
   field.addEventListener("input", scheduleAutoSave);
@@ -1121,3 +1289,5 @@ $("#importFile").addEventListener("change", async event => {
     event.target.value = "";
   }
 });
+
+

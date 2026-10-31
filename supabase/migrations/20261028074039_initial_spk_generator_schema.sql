@@ -571,3 +571,5 @@ create policy "workspace members can delete own workspace storage files"
   on storage.objects for delete to authenticated
   using (bucket_id = 'spk-files'
     and private.is_workspace_member(private.storage_workspace_id(name)));
+
+
