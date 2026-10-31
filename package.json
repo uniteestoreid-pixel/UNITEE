@@ -5,8 +5,6 @@
   "description": "SPK Generator for garment production, with optional Supabase cloud persistence",
   "scripts": {
     "build": "node build-config.cjs",
-    "check": "node --check script.js && node --check cloud.js && node --check config.js && node tests/static-check.cjs && node tests/cloud-regression.cjs"
+    "check": "node --check script.js && node --check cloud.js && node --check accessories.js && node --check config.js && node tests/static-check.cjs && node tests/cloud-regression.cjs"
   }
 }
-
-
