@@ -16,14 +16,29 @@ let members = {
   'user-b': []
 };
 
+function makeClassList() {
+  const values = new Set();
+  return {
+    add(...names) { names.forEach(name => values.add(name)); },
+    remove(...names) { names.forEach(name => values.delete(name)); },
+    toggle(name, force) {
+      const shouldAdd = force === undefined ? !values.has(name) : Boolean(force);
+      if (shouldAdd) values.add(name); else values.delete(name);
+      return shouldAdd;
+    },
+    contains(name) { return values.has(name); }
+  };
+}
+
 function element(id) {
   if (elements.has(id)) return elements.get(id);
   const value = {
     id, value: '', textContent: '', innerHTML: '', disabled: false, hidden: false,
-    children: [], classList: { add() {}, remove() {}, toggle() {} },
+    children: [], classList: makeClassList(),
     addEventListener(event, callback) { handlers.set(`${id}:${event}`, callback); },
     replaceChildren(...children) { this.children = children; }, append(...children) { this.children.push(...children); },
-    setAttribute() {}, removeAttribute() {}, appendChild(child) { this.children.push(child); }
+    setAttribute(name, value) { this[name] = value; }, removeAttribute(name) { delete this[name]; },
+    appendChild(child) { this.children.push(child); }, scrollIntoView() {}
   };
   elements.set(id, value);
   return value;
@@ -31,7 +46,7 @@ function element(id) {
 
 const document = {
   readyState: 'complete',
-  body: { classList: { add() {}, remove() {}, toggle() {} } },
+  body: { classList: makeClassList() },
   querySelector(selector) { return element(selector.replace(/^#/, '')); },
   querySelectorAll() { return []; },
   createTextNode(text) { return { textContent: text }; },
@@ -94,6 +109,7 @@ const window = {
   SPK_CONFIG: { supabaseUrl: 'https://example.supabase.co', supabaseAnonKey: 'publishable-test-key' },
   supabase: { createClient() { return client; } },
   addEventListener() {},
+  scrollTo() {},
   dispatchEvent() {},
   SpkApp: {
     startNew() { startNewCalls++; },
@@ -120,6 +136,18 @@ async function waitFor(predicate, message) {
   vm.runInNewContext(source, context, { filename: 'cloud.js' });
   await waitFor(() => window.SpkCloud?.getWorkspaceId() === 'workspace-a', 'Initial session did not load its workspace');
   assert.equal(JSON.parse(storage.get('spk_generator_data_v3')).length, 1, 'Initial member should see the workspace SPK');
+  assert.equal(element('cloudPanel').classList.contains('hidden'), true,
+    'The workspace account panel should collapse after the SPK workspace loads');
+  assert.equal(element('accountMenuBtn').classList.contains('hidden'), false,
+    'An active workspace should keep a compact account menu available');
+  assert.equal(element('accountMenuBtn').textContent, 'UNITEE · admin',
+    'The compact account menu should identify the active workspace and role');
+  await handlers.get('accountMenuBtn:click')();
+  assert.equal(element('cloudPanel').classList.contains('hidden'), false,
+    'The compact account menu should reopen workspace controls');
+  await handlers.get('accountMenuBtn:click')();
+  assert.equal(element('cloudPanel').classList.contains('hidden'), true,
+    'The compact account menu should collapse workspace controls again');
 
   const readsBeforeRefresh = membershipReads.length;
   const resetsBeforeRefresh = startNewCalls;

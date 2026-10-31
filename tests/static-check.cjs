@@ -63,7 +63,12 @@ for (const table of ['company_logos', 'spk_records', 'spk_sizes', 'spk_approvals
 }
 assert.match(cloud, /spk-files/, 'Expected private Supabase Storage bucket reference is missing');
 assert.match(html, /id="refreshWorkspaceBtn"/, 'Workspace membership refresh control is missing');
+assert.match(html, /id="accountMenuBtn"/, 'Compact workspace menu control is missing');
 assert.match(cloud, /ACTIVE_WORKSPACE_KEY/, 'Selected workspace must be remembered per account');
+assert.match(cloud, /classList\.toggle\("hidden", cloudActive && !accountPanelOpen\)/,
+  'The account panel should collapse after a workspace is active');
+assert.match(css, /body\.cloud-active \.mode-notice\s*\{\s*display:none !important;/,
+  'The cloud status banner must not take space above the active SPK view');
 assert.match(cloud, /event === "TOKEN_REFRESHED"[\s\S]*?return;/, 'Token refresh must not reload memberships or reset the editor');
 assert.match(cloud, /CACHE_SOURCE_KEY/, 'Local records and the cloud cache must not be mixed between accounts');
 assert.match(cloud, /assertWorkspaceContext\(context\)/, 'Cloud writes must reject account or workspace switches in flight');

@@ -17,6 +17,7 @@
   let initialized = false;
   let switchingWorkspace = false;
   let recoveryMode = false;
+  let accountPanelOpen = true;
   let sessionEpoch = 0;
   let workspaceLoadGeneration = 0;
   let activationGeneration = 0;
@@ -59,10 +60,18 @@
 
   function showAccountUI() {
     const loggedIn = Boolean(session);
+    const cloudActive = isActive();
     $("#authForm")?.classList.toggle("hidden", loggedIn);
     $("#accountControls")?.classList.toggle("hidden", !loggedIn);
     $("#workspaceSetup")?.classList.toggle("hidden", !loggedIn || memberships.length > 0);
     $("#workspaceControls")?.classList.toggle("hidden", !loggedIn || memberships.length === 0);
+    $("#cloudPanel")?.classList.toggle("hidden", cloudActive && !accountPanelOpen);
+    const accountMenu = $("#accountMenuBtn");
+    if (accountMenu) {
+      accountMenu.classList.toggle("hidden", !cloudActive);
+      accountMenu.textContent = workspaceName ? `${workspaceName} · ${currentRole}` : "Workspace";
+      accountMenu.setAttribute("aria-expanded", String(cloudActive && accountPanelOpen));
+    }
     $("#signedInEmail") && ( $("#signedInEmail").textContent = session?.user?.email || "" );
     $("#signedInId") && ( $("#signedInId").textContent = session?.user?.id || "" );
     $("#copyUserIdBtn") && ( $("#copyUserIdBtn").disabled = !session?.user?.id );
@@ -380,6 +389,8 @@
         window.SpkApp.startNew(false, { preserveDraft: true });
         await window.SpkApp.restoreDraft?.();
       }
+      accountPanelOpen = false;
+      showAccountUI();
     } catch (error) {
       if (activation === activationGeneration && activationEpoch === sessionEpoch) {
         workspaceId = null;
@@ -463,6 +474,12 @@
   }
 
   function setupEvents() {
+    $("#accountMenuBtn")?.addEventListener("click", () => {
+      accountPanelOpen = !accountPanelOpen;
+      showAccountUI();
+      if (accountPanelOpen) $("#cloudPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      else window.scrollTo({ top: 0, behavior: "smooth" });
+    });
     $("#authForm")?.addEventListener("submit", async event => {
       event.preventDefault();
       const email = $("#authEmail").value.trim(); const password = $("#authPassword").value;
@@ -648,7 +665,9 @@
           void window.SpkApp?.preserveCurrentDraft?.().catch(error => console.warn("Could not preserve draft before account switch", error));
           session = null;
           workspaceId = null; memberships = []; currentRole = "member"; workspaceName = "";
+          accountPanelOpen = true;
           document.body.classList.remove("cloud-active");
+          showAccountUI();
           clearActiveCache(nextSession ? "cloud" : "local");
           window.SpkApp?.startNew?.(false, { preserveDraft: true });
         }
