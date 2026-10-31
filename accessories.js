@@ -250,8 +250,7 @@
       img.hidden = false;
       empty.hidden = true;
     } else if (state.referenceFile) {
-      if (state.previewObjectUrl) URL.revokeObjectURL(state.previewObjectUrl);
-      state.previewObjectUrl = URL.createObjectURL(state.referenceFile);
+      if (!state.previewObjectUrl) state.previewObjectUrl = URL.createObjectURL(state.referenceFile);
       img.src = state.previewObjectUrl;
       img.hidden = false;
       empty.hidden = true;
@@ -264,16 +263,19 @@
 
   async function loadRecords() {
     if (!isCloudReady()) {
+      state.loadToken++;
       state.records = [];
       state.currentWorkspaceId = null;
       state.currentUserId = null;
+      startNew(false);
       renderHistory();
       status("Login dan pilih workspace untuk menyimpan serta berbagi SPK Aksesoris.");
       return;
     }
     const context = getContext();
     const workspaceChanged = state.currentWorkspaceId && state.currentWorkspaceId !== context.workspaceId;
-    if (workspaceChanged) startNew(false);
+    const accountChanged = state.currentUserId && state.currentUserId !== context.userId;
+    if (workspaceChanged || accountChanged) startNew(false);
     const token = ++state.loadToken;
     state.loading = true;
     status("Memuat arsip aksesoris workspace…");
@@ -440,9 +442,12 @@
     const button = $("#accessorySaveBtn");
     state.saving = true;
     setButtonBusy(button, true, "Menyimpan…");
+    let uploadedReferencePath = null;
+    let databaseSaved = false;
     try {
       const recordId = state.activeId || makeId();
       const referencePath = await uploadReference(context, recordId);
+      if (state.referenceFile) uploadedReferencePath = referencePath;
       if (!contextStillMatches(context)) throw new Error("Akun atau workspace berubah. Data tidak disimpan ke workspace yang salah.");
       const now = new Date().toISOString();
       const previous = state.records.find(record => record.id === recordId);
@@ -482,6 +487,7 @@
         if (result.error) throw result.error;
         saved = result.data;
       }
+      databaseSaved = Boolean(saved);
       if (!contextStillMatches(context)) throw new Error("Sesi berubah setelah simpan. Pilih kembali workspace aktif sebelum melanjutkan.");
       state.activeId = saved.id;
       state.version = saved.version;
@@ -492,9 +498,17 @@
       if (state.previewObjectUrl) URL.revokeObjectURL(state.previewObjectUrl);
       state.previewObjectUrl = null;
       updatePreview();
-      await loadRecords();
-      status(saved.spk_no + " berhasil disimpan di workspace. Anggota lain pada workspace yang sama dapat melihatnya.");
+      try {
+        await loadRecords();
+        status(saved.spk_no + " berhasil disimpan di workspace. Anggota lain pada workspace yang sama dapat melihatnya.");
+      } catch (refreshError) {
+        status(saved.spk_no + " tersimpan, tetapi daftar arsip gagal dimuat ulang. Tekan Muat ulang arsip. " + errorMessage(refreshError), true);
+      }
     } catch (error) {
+      if (uploadedReferencePath && !databaseSaved && contextStillMatches(context)) {
+        try { await context.client.storage.from(BUCKET).remove([uploadedReferencePath]); }
+        catch (cleanupError) { console.warn("Could not clean up an unused accessory image", cleanupError); }
+      }
       status(errorMessage(error), true);
     } finally {
       state.saving = false;
@@ -576,6 +590,8 @@
         event.target.value = "";
         return;
       }
+      if (state.previewObjectUrl) URL.revokeObjectURL(state.previewObjectUrl);
+      state.previewObjectUrl = null;
       state.referenceFile = file;
       state.removeReference = false;
       state.referenceUrl = "";
