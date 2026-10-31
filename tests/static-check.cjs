@@ -30,7 +30,7 @@ assert.deepEqual(missingSelectors, [], 'JavaScript references HTML IDs that do n
 
 assert.match(html, /href=["']styles\.css["']/, 'Stylesheet link is missing');
 const configIndex = html.indexOf('src="config.js"');
-const cloudIndex = html.indexOf('src="cloud.js"');
+const cloudIndex = html.search(/src="cloud\.js(?:\?[^\"]*)?"/);
 const scriptIndex = html.indexOf('src="script.js"');
 assert.ok(configIndex >= 0 && configIndex < cloudIndex && cloudIndex < scriptIndex,
   'Client scripts must load in config.js -> cloud.js -> script.js order');
