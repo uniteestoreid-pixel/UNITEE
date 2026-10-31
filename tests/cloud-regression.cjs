@@ -131,6 +131,7 @@ async function waitFor(predicate, message) {
   currentUserId = 'user-b';
   authListener('SIGNED_IN', { user: { id: 'user-b', email: 'b@example.test' } });
   await waitFor(() => element('cloudStatus').textContent.includes('belum menjadi anggota'), 'Uninvited account should receive a clear workspace membership message');
+  assert.ok(startNewCalls > resetsBeforeRefresh, 'Account switches must clear the previous account form immediately');
   assert.equal(window.SpkCloud.getWorkspaceId(), null, 'An account without membership must not keep the previous workspace active');
   assert.deepEqual(JSON.parse(storage.get('spk_generator_data_v3')), [], 'A different account must not keep seeing the previous account cache');
 

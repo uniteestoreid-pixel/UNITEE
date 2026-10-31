@@ -929,6 +929,7 @@ function startNewSpk(showMessage = true, options = {}) {
   const generation = formGeneration;
   formRevision++;
   persistedFormRevision = formRevision;
+  draftDirty = false;
   if (!options.preserveDraft) void clearCurrentDraft();
   currentRecordId = null;
   currentCreatedAt = null;
