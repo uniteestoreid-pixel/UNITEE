@@ -13,7 +13,7 @@ if (Boolean(supabaseUrl) !== Boolean(supabaseAnonKey)) {
 }
 
 const outputDir = path.join(root, 'dist');
-const publicFiles = ['index.html', 'styles.css', 'script.js', 'cloud.js'];
+const publicFiles = ['index.html', 'styles.css', 'script.js', 'cloud.js', 'accessories.js'];
 fs.rmSync(outputDir, { recursive: true, force: true });
 fs.mkdirSync(outputDir, { recursive: true });
 for (const file of publicFiles) {
