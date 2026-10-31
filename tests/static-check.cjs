@@ -5,7 +5,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 
-for (const file of ['index.html', 'styles.css', 'script.js', 'cloud.js', 'config.js', 'build-config.cjs', 'package.json']) {
+for (const file of ['index.html', 'styles.css', 'script.js', 'cloud.js', 'config.js', 'build-config.cjs', 'package.json', 'accessories.js', 'supabase/migrations/20261031111600_add_accessory_spk_module.sql']) {
   assert.ok(fs.existsSync(path.join(root, file)), 'Missing required file: ' + file);
 }
 
@@ -13,6 +13,8 @@ const html = read('index.html');
 const css = read('styles.css');
 const script = read('script.js');
 const cloud = read('cloud.js');
+const accessories = read('accessories.js');
+const accessoryMigration = read('supabase/migrations/20261031111600_add_accessory_spk_module.sql');
 const config = read('config.js');
 const build = read('build-config.cjs');
 const migration = read('supabase/migrations/20261028074039_initial_spk_generator_schema.sql');
@@ -22,9 +24,13 @@ const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 assert.ok(ids.length > 0, 'No HTML element IDs found');
 assert.equal(new Set(ids).size, ids.length, 'Duplicate HTML IDs found');
 
+assert.match(html, /id="spkPageTab"/);
+assert.match(html, /id="accessoryPageTab"/);
+assert.match(html, /id="accessoryPage"/);
+assert.match(html, /src="accessories\.js"/);
 const selectorIds = source => [...source.matchAll(/\$\(\s*["']#([\w-]+)["']\s*\)/g)].map(match => match[1]);
 const availableIds = new Set(ids);
-const missingSelectors = [...new Set([...selectorIds(script), ...selectorIds(cloud)])]
+const missingSelectors = [...new Set([...selectorIds(script), ...selectorIds(cloud), ...selectorIds(accessories)])]
   .filter(id => !availableIds.has(id));
 assert.deepEqual(missingSelectors, [], 'JavaScript references HTML IDs that do not exist');
 
@@ -87,7 +93,17 @@ assert.match(migration, /create policy "workspace members can read SPK records"[
 assert.match(migration, /values \('spk-files', 'spk-files', false, 15728640\)/,
   'SPK Storage must remain private with its configured size limit');
 
-for (const source of [html, script, cloud, config, build]) {
+assert.match(accessories, /const TABLE = "accessory_spk_records"/);
+assert.match(accessories, /getWorkspaceId\?\./, 'Accessory records must use the active shared workspace');
+assert.match(accessories, /\.eq\("workspace_id", context\.workspaceId\)/, 'Accessory reads must be scoped to the active workspace');
+assert.match(accessories, /\.eq\("version", state\.version\)/, 'Accessory updates must detect concurrent edits');
+assert.match(accessories, /\.is\("deleted_at", null\)/, 'Archived accessory SPKs must not appear in the active list');
+assert.match(accessories, /accessories\//, 'Accessory reference files must use a dedicated private Storage path');
+assert.match(accessoryMigration, /alter table public\.accessory_spk_records enable row level security/);
+assert.match(accessoryMigration, /private\.is_workspace_member\(workspace_id\)/);
+assert.match(accessoryMigration, /revoke all on table public\.accessory_spk_records from public, anon/);
+assert.match(build, /'accessories\.js'/, 'GitHub Pages build must include the accessory module');
+for (const source of [html, script, cloud, accessories, config, build]) {
   assert.doesNotMatch(source, /service_role\s*[:=]\s*['"]|sb_secret_[A-Za-z0-9_-]+/i,
     'A server-only Supabase credential must never appear in client code');
 }
