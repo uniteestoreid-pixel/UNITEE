@@ -532,6 +532,15 @@ body.accessory-mode .header-actions > :not(#accountMenuBtn) { display: none !imp
 }
 .accessory-document-brand { display: grid; gap: 2px; color: #111827; }
 .accessory-document-brand strong { font-size: 27px; letter-spacing: -.06em; }
+.accessory-document-brand img {
+  display: block;
+  width: 42mm;
+  max-width: 100%;
+  max-height: 15mm;
+  height: auto;
+  object-fit: contain;
+  object-position: left center;
+}
 .accessory-document-brand span { font-size: 7px; font-weight: 800; letter-spacing: .28em; }
 .accessory-document-title { text-align: right; }
 .accessory-document-title p { margin: 0 0 3px; color: #64748b; font-size: 9px; font-weight: 800; letter-spacing: .16em; }
@@ -677,7 +686,11 @@ body.accessory-mode .header-actions > :not(#accountMenuBtn) { display: none !imp
     break-inside: avoid;
     page-break-inside: avoid;
   }
-  body.accessory-mode .accessory-document-brand strong { font-size: 26pt; }
+  body.accessory-mode .accessory-document-brand img {
+    width: 42mm;
+    max-width: 100%;
+    max-height: 15mm;
+  }
   body.accessory-mode .accessory-document-title h2 { font-size: 16pt; }
   body.accessory-mode .accessory-document-meta { gap: 3mm 6mm; margin-top: 4mm; }
   body.accessory-mode .accessory-document-meta span { font-size: 9pt; }
