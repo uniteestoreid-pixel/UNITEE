@@ -158,6 +158,12 @@ assert.match(accessoryPrintCss, /body\.accessory-mode \.accessory-reference-fram
   'Accessory reference images must fit the page without cropping');
 assert.match(accessoryPrintCss, /body\.accessory-mode \.accessory-document-approval\s*\{[^}]*break-inside:\s*avoid;[^}]*page-break-inside:\s*avoid;/s,
   'Accessory approval signatures should stay together');
+assert.match(html, /<img src="https:\/\/cdn\.phototourl\.com\/member\/2026-10-31-b2772341-83fd-435a-908f-09eaa9434ec4\.png" alt="Logo UNITEE">/,
+  'Accessory document must use the supplied UNITEE logo');
+assert.match(css, /\.accessory-document-brand img\s*\{[^}]*max-width:\s*100%;[^}]*max-height:\s*15mm;[^}]*object-fit:\s*contain;/s,
+  'UNITEE logo must fit the accessory document without distortion');
+assert.match(accessoryPrintCss, /body\.accessory-mode \.accessory-document-brand img\s*\{[^}]*max-width:\s*100%;[^}]*max-height:\s*15mm;/s,
+  'UNITEE logo must stay within the accessory print width');
 assert.match(accessoryPrintCss, /body\.accessory-mode \.accessory-signatures > div\s*\{[^}]*min-height:\s*24mm;/s,
   'Accessory signature blocks must remain compact');
 assert.doesNotMatch(accessoryPrintCss, /height:\s*297mm|transform:\s*scale/i,
