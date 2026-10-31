@@ -13,7 +13,7 @@
     currentWorkspaceId: null, currentUserId: null,
     referencePath: null, referenceUrl: "", referenceFile: null,
     removeReference: false, loading: false, loadToken: 0,
-    saving: false, previewObjectUrl: null
+    saving: false, printing: false, previewObjectUrl: null
   };
 
   function cloud() { return window.SpkCloud; }
@@ -77,6 +77,20 @@
       if (button.dataset.oldLabel) button.textContent = button.dataset.oldLabel;
       delete button.dataset.oldLabel;
     }
+  }
+  function setAccessoryBusy(busy) {
+    const page = $("#accessoryPage");
+    if (!page) return;
+    const controls = [...page.querySelectorAll("input,select,textarea,button"), $("#spkPageTab"), $("#accessoryPageTab")].filter(Boolean);
+    controls.forEach(control => {
+      if (busy) {
+        control.dataset.wasDisabled = String(control.disabled);
+        control.disabled = true;
+      } else if (control.dataset.wasDisabled !== undefined) {
+        control.disabled = control.dataset.wasDisabled === "true";
+        delete control.dataset.wasDisabled;
+      }
+    });
   }
   function errorMessage(error) {
     const message = String(error?.message || error || "Operasi gagal.");
@@ -212,6 +226,49 @@
     return "";
   }
 
+  function validateDocumentForPrint() {
+    if (!value("#accCustomer")) {
+      status("Nama customer / divisi belum diisi.", true);
+      $("#accCustomer").focus();
+      return false;
+    }
+    if (!value("#accOrder")) {
+      status("Nama order belum diisi.", true);
+      $("#accOrder").focus();
+      return false;
+    }
+    if (state.referencePath && !state.referenceUrl && !state.referenceFile && !state.removeReference) {
+      status("Gambar referensi arsip belum siap. Muat ulang arsip sebelum mencetak.", true);
+      return false;
+    }
+    const items = readItems();
+    const itemError = validateItems(items);
+    if (itemError) {
+      status(itemError, true);
+      const match = itemError.match(/item (\d+)/i);
+      const row = match ? $("#accessoryItemRows").children[Number(match[1]) - 1] : null;
+      if (/nama aksesoris/i.test(itemError)) row?.querySelector('[data-field="name"]')?.focus();
+      else if (/jumlah item/i.test(itemError)) row?.querySelector('[data-field="quantity"]')?.focus();
+      else row?.querySelector("input,select")?.focus();
+      return false;
+    }
+    const total = items.reduce((sum, item) => sum + item.quantity, 0);
+    if (!Number.isSafeInteger(total) || total > 1000000) {
+      status("Total jumlah aksesoris tidak valid.", true);
+      return false;
+    }
+    return true;
+  }
+
+  function setFormMode(editing) {
+    const eyebrow = $("#accessoryFormTop .eyebrow");
+    const heading = $("#accessoryFormTop h2");
+    if (eyebrow) eyebrow.textContent = editing ? "EDIT ARSIP" : "FORMULIR BARU";
+    if (heading) heading.textContent = editing ? "Perbarui informasi pesanan" : "Informasi pesanan";
+    const saveButton = $("#accessorySaveBtn");
+    if (saveButton) saveButton.textContent = editing ? "Simpan perubahan" : "Simpan Aksesoris";
+  }
+
   function updatePreview() {
     if (!$("#accessoryPrintDocument")) return;
     text("#accPreviewNumber", value("#accSpkNo"));
@@ -263,13 +320,14 @@
 
   async function loadRecords() {
     if (!isCloudReady()) {
+      const hadCloudContext = Boolean(state.currentWorkspaceId || state.currentUserId);
       state.loadToken++;
       state.records = [];
       state.currentWorkspaceId = null;
       state.currentUserId = null;
-      startNew(false);
+      if (hadCloudContext) startNew(false);
       renderHistory();
-      status("Login dan pilih workspace untuk menyimpan serta berbagi SPK Aksesoris.");
+      status("Login dan pilih workspace untuk menyimpan arsip bersama. Formulir tetap bisa langsung dicetak atau disimpan sebagai PDF.");
       return;
     }
     const context = getContext();
@@ -342,8 +400,8 @@
       print.className = "btn small";
       print.textContent = "Cetak";
       print.addEventListener("click", async () => {
-        await openRecord(record.id);
-        await printRecord();
+        if (!await openRecord(record.id)) return;
+        await printRecord(print);
       });
       actions.append(edit, print);
       card.append(info, actions);
@@ -353,14 +411,18 @@
 
   async function openRecord(recordId) {
     const record = state.records.find(item => item.id === recordId);
-    if (!record) return;
-    const context = getContext();
+    if (!record) return false;
+    let context;
+    try { context = getContext(); }
+    catch (error) { status(errorMessage(error), true); return false; }
     state.activeId = record.id;
     state.version = Number(record.version) || 1;
     state.referencePath = record.reference_image_path || null;
     state.referenceUrl = "";
     state.referenceFile = null;
     state.removeReference = false;
+    if (state.previewObjectUrl) URL.revokeObjectURL(state.previewObjectUrl);
+    state.previewObjectUrl = null;
     $("#accSpkNo").value = record.spk_no || "";
     $("#accCustomer").value = record.customer || "";
     $("#accOrder").value = record.order_name || "";
@@ -373,18 +435,33 @@
     $("#accApCustomer").value = record.ap_customer || "";
     $("#accApProduction").value = record.ap_production || "";
     $("#accReferenceInput").value = "";
+    setFormMode(true);
     renderItems(Array.isArray(record.items) ? record.items : []);
+    updatePreview();
     if (state.referencePath) {
       try {
         state.referenceUrl = await cloud().signPath(state.referencePath);
-        if (!contextStillMatches(context)) return;
+        if (!contextStillMatches(context)) {
+          startNew(false);
+          return false;
+        }
       } catch {
+        if (!contextStillMatches(context)) {
+          startNew(false);
+          return false;
+        }
         status("SPK dibuka, tetapi gambar referensi belum bisa dimuat. Coba muat ulang arsip.", true);
+        return false;
       }
+    }
+    if (!contextStillMatches(context)) {
+      startNew(false);
+      return false;
     }
     updatePreview();
     status("Membuka " + record.spk_no + ". Perubahan baru tersimpan setelah tombol Simpan ditekan.");
     $("#accessoryFormTop")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return true;
   }
 
   function startNew(showStatus = true) {
@@ -394,6 +471,7 @@
     state.referenceUrl = "";
     state.referenceFile = null;
     state.removeReference = false;
+    setFormMode(false);
     if (state.previewObjectUrl) URL.revokeObjectURL(state.previewObjectUrl);
     state.previewObjectUrl = null;
     $("#accSpkNo").value = newNumber();
@@ -410,7 +488,7 @@
     $("#accReferenceInput").value = "";
     renderItems([{}]);
     updatePreview();
-    if (showStatus) status("Form aksesoris baru siap. Isi pesanan lalu tekan Simpan.");
+    if (showStatus) status("Form baru siap. Simpan Aksesoris untuk masuk arsip, atau cetak / simpan PDF langsung dari isian ini.");
   }
 
   async function uploadReference(context, recordId) {
@@ -426,7 +504,7 @@
   }
 
   async function saveRecord() {
-    if (state.saving) return;
+    if (state.saving || state.printing) return;
     let context;
     try { context = getContext(); }
     catch (error) { status(errorMessage(error), true); return; }
@@ -441,6 +519,7 @@
     if (!Number.isSafeInteger(total) || total > 1000000) { status("Total jumlah aksesoris tidak valid.", true); return; }
     const button = $("#accessorySaveBtn");
     state.saving = true;
+    setAccessoryBusy(true);
     setButtonBusy(button, true, "Menyimpan…");
     let uploadedReferencePath = null;
     let databaseSaved = false;
@@ -512,18 +591,21 @@
       status(errorMessage(error), true);
     } finally {
       state.saving = false;
+      setAccessoryBusy(false);
       setButtonBusy(button, false);
+      setFormMode(Boolean(state.activeId));
     }
   }
 
   async function deleteRecord() {
-    if (!state.activeId || state.saving) return;
+    if (!state.activeId || state.saving || state.printing) return;
     if (!confirm("Arsip SPK Aksesoris ini akan disembunyikan dari daftar aktif. Lanjutkan?")) return;
     let context;
     try { context = getContext(); }
     catch (error) { status(errorMessage(error), true); return; }
     const button = $("#accessoryDeleteBtn");
     state.saving = true;
+    setAccessoryBusy(true);
     setButtonBusy(button, true, "Mengarsipkan…");
     try {
       const now = new Date().toISOString();
@@ -543,6 +625,7 @@
       status(errorMessage(error), true);
     } finally {
       state.saving = false;
+      setAccessoryBusy(false);
       setButtonBusy(button, false);
     }
   }
@@ -569,15 +652,39 @@
       timer = setTimeout(() => finish(ready()), timeout);
     });
   }
-  async function printRecord() {
-    updatePreview();
-    const results = await Promise.all([...$("#accessoryPrintDocument").querySelectorAll("img")].map(img => waitForImage(img)));
-    if (results.some(success => !success)) {
-      status("Cetak dibatalkan karena gambar referensi belum selesai dimuat.", true);
-      return;
+  function getPrintTitle() {
+    const parts = [value("#accSpkNo"), value("#accCustomer"), value("#accOrder")].filter(Boolean);
+    return (parts.join(" - ").replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ").trim().slice(0, 120)) || "SPK Aksesoris UNITEE";
+  }
+  async function printRecord(button = $("#accessoryPrintBtn")) {
+    if (state.printing || state.saving || !validateDocumentForPrint()) return;
+    state.printing = true;
+    setAccessoryBusy(true);
+    const originalTitle = document.title;
+    const brandLogo = $("#accessoryPrintDocument .accessory-document-brand img");
+    const originalLogoHidden = brandLogo?.hidden ?? false;
+    setButtonBusy(button, true, "Menyiapkan cetak…");
+    try {
+      updatePreview();
+      const referenceImage = $("#accPreviewImage");
+      if (!await waitForImage(referenceImage)) {
+        status("Cetak dibatalkan karena gambar referensi belum selesai dimuat.", true);
+        return;
+      }
+      if (brandLogo && !await waitForImage(brandLogo, 6000)) brandLogo.hidden = true;
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      document.title = getPrintTitle();
+      status("Dokumen siap dicetak. Pilih “Simpan sebagai PDF” pada dialog cetak; isian ini tidak disimpan ke arsip.");
+      window.print();
+    } catch (error) {
+      status("Dokumen tidak dapat disiapkan untuk dicetak. " + errorMessage(error), true);
+    } finally {
+      document.title = originalTitle;
+      if (brandLogo) brandLogo.hidden = originalLogoHidden;
+      state.printing = false;
+      setAccessoryBusy(false);
+      setButtonBusy(button, false);
     }
-    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    window.print();
   }
 
   function setupImage() {
@@ -617,7 +724,7 @@
     $("#accessoryNewBtn").addEventListener("click", () => startNew(true));
     $("#accessorySaveBtn").addEventListener("click", saveRecord);
     $("#accessoryDeleteBtn").addEventListener("click", deleteRecord);
-    $("#accessoryPrintBtn").addEventListener("click", printRecord);
+    $("#accessoryPrintBtn").addEventListener("click", event => printRecord(event.currentTarget));
     $("#accessoryRefreshBtn").addEventListener("click", () => loadRecords().catch(error => status(errorMessage(error), true)));
     $("#spkPageTab").addEventListener("click", () => setPage("spk"));
     $("#accessoryPageTab").addEventListener("click", () => setPage("accessories"));
@@ -629,12 +736,15 @@
   window.addEventListener("spkcloud:loaded", () => {
     if (isCloudReady()) loadRecords().catch(error => status(errorMessage(error), true));
     else {
+      const hadCloudContext = Boolean(state.currentWorkspaceId || state.currentUserId);
       state.loadToken++;
       state.records = [];
       state.currentWorkspaceId = null;
       state.currentUserId = null;
+      if (hadCloudContext) startNew(false);
       renderHistory();
-      status("Login dan pilih workspace untuk menggunakan arsip aksesoris.");
+      status("Login dan pilih workspace untuk melihat arsip bersama. Formulir tetap bisa langsung dicetak atau disimpan sebagai PDF.");
     }
   });
 })();
+
