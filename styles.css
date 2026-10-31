@@ -616,12 +616,13 @@ body.accessory-mode .header-actions > :not(#accountMenuBtn) { display: none !imp
 .accessory-empty-state { padding: 16px 10px; border: 1px dashed var(--line); border-radius: 9px; color: var(--muted); text-align: center; font-size: 12px; }
 
 @media print {
-  @page { size: A4 portrait; margin: 10mm; }
-  body.accessory-mode { background: #fff !important; }
+  @page accessory-a4 { size: A4 portrait; margin: 10mm; }
+  body.accessory-mode { background: #fff !important; overflow: visible !important; }
   body.accessory-mode .app-header,
   body.accessory-mode .page-nav,
   body.accessory-mode .mode-notice,
   body.accessory-mode .cloud-panel,
+  body.accessory-mode .app,
   body.accessory-mode .accessory-page-head,
   body.accessory-mode .accessory-status,
   body.accessory-mode .accessory-editor-card,
@@ -634,40 +635,127 @@ body.accessory-mode .header-actions > :not(#accountMenuBtn) { display: none !imp
     width: 100%;
     max-width: none;
     margin: 0;
+    padding: 0;
+    overflow: visible !important;
   }
   body.accessory-mode .accessory-layout,
   body.accessory-mode .accessory-side,
   body.accessory-mode .accessory-preview-card {
     display: block !important;
     width: 100%;
+    max-width: 190mm;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    overflow: visible !important;
+  }
+  body.accessory-mode #accessoryPrintDocument {
+    page: accessory-a4;
+    display: block !important;
+    width: 100%;
+    max-width: 190mm;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: visible;
+    overflow-wrap: anywhere;
     margin: 0;
     padding: 0;
     border: 0;
     box-shadow: none;
     background: #fff;
-  }
-  body.accessory-mode #accessoryPrintDocument {
-    display: block !important;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    box-shadow: none;
     font-size: 10pt;
   }
-  body.accessory-mode .accessory-document-header { padding-bottom: 5mm; }
+  body.accessory-mode .accessory-document-header {
+    padding-bottom: 5mm;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  body.accessory-mode .accessory-document-meta {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
   body.accessory-mode .accessory-document-brand strong { font-size: 26pt; }
   body.accessory-mode .accessory-document-title h2 { font-size: 16pt; }
   body.accessory-mode .accessory-document-meta { gap: 3mm 6mm; margin-top: 4mm; }
   body.accessory-mode .accessory-document-meta span { font-size: 9pt; }
   body.accessory-mode .accessory-document-meta strong { font-size: 10pt; }
-  body.accessory-mode .accessory-document-section { margin-top: 6mm; break-inside: avoid; page-break-inside: avoid; }
-  body.accessory-mode .accessory-print-table { font-size: 9pt; }
+  body.accessory-mode .accessory-document-section {
+    margin-top: 6mm;
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+  body.accessory-mode .accessory-document-section > h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  body.accessory-mode .accessory-print-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: visible !important;
+  }
+  body.accessory-mode .accessory-print-table {
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 9pt;
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+  body.accessory-mode .accessory-print-table thead { display: table-header-group; }
+  body.accessory-mode .accessory-print-table tfoot { display: table-row-group; }
+  body.accessory-mode .accessory-print-table tbody tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
   body.accessory-mode .accessory-print-table th,
-  body.accessory-mode .accessory-print-table td { padding: 2.5mm 2mm; }
-  body.accessory-mode .accessory-reference-frame { min-height: 30mm; max-height: 65mm; }
-  body.accessory-mode .accessory-reference-frame img { max-height: 65mm; }
-  body.accessory-mode .accessory-signatures > div { min-height: 27mm; }
+  body.accessory-mode .accessory-print-table td {
+    max-width: 100%;
+    padding: 2.5mm 2mm;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    vertical-align: top;
+  }
+  body.accessory-mode .accessory-print-table td.quantity-cell { white-space: normal; }
+  body.accessory-mode .accessory-reference-section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  body.accessory-mode .accessory-reference-frame {
+    min-height: 30mm;
+    max-height: 65mm;
+    overflow: hidden;
+  }
+  body.accessory-mode .accessory-reference-frame img {
+    width: 100%;
+    max-width: 100%;
+    max-height: 60mm;
+    object-fit: contain;
+  }
+  body.accessory-mode .accessory-document-notes p {
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+    orphans: 2;
+    widows: 2;
+  }
+  body.accessory-mode .accessory-document-approval {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  body.accessory-mode .accessory-signatures {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  body.accessory-mode .accessory-signatures > div {
+    min-height: 24mm;
+    padding: 3mm 2mm;
+    overflow-wrap: anywhere;
+  }
 }
 @media (max-width: 980px) {
   .accessory-layout { grid-template-columns: 1fr; }
@@ -692,3 +780,4 @@ body.accessory-mode .header-actions > :not(#accountMenuBtn) { display: none !imp
   .accessory-history-row { align-items: flex-start; flex-direction: column; }
   .accessory-history-actions { width: 100%; }
 }
+
