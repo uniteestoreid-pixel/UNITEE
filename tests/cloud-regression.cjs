@@ -140,8 +140,10 @@ async function waitFor(predicate, message) {
     'The workspace account panel should collapse after the SPK workspace loads');
   assert.equal(element('accountMenuBtn').classList.contains('hidden'), false,
     'An active workspace should keep a compact account menu available');
-  assert.equal(element('accountMenuBtn').textContent, 'UNITEE · admin',
-    'The compact account menu should identify the active workspace and role');
+  assert.equal(element('accountMenuBtn').textContent, 'Akun / Login',
+    'The compact account menu should make account and login controls easy to find');
+  assert.match(element('accountMenuBtn').title, /UNITEE · admin/,
+    'The compact account menu tooltip should identify the active workspace and role');
   await handlers.get('accountMenuBtn:click')();
   assert.equal(element('cloudPanel').classList.contains('hidden'), false,
     'The compact account menu should reopen workspace controls');

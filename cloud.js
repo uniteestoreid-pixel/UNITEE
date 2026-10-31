@@ -69,7 +69,13 @@
     const accountMenu = $("#accountMenuBtn");
     if (accountMenu) {
       accountMenu.classList.toggle("hidden", !cloudActive);
-      accountMenu.textContent = workspaceName ? `${workspaceName} · ${currentRole}` : "Workspace";
+      accountMenu.textContent = cloudActive ? "Akun / Login" : "Login";
+      accountMenu.setAttribute("aria-label", cloudActive
+        ? `Akun dan login. Masuk sebagai ${session?.user?.email || "pengguna"}; buka untuk mengelola workspace atau logout.`
+        : "Login dan akun workspace");
+      accountMenu.title = cloudActive
+        ? `Masuk sebagai ${session?.user?.email || "pengguna"} · ${workspaceName} · ${currentRole}`
+        : "Login dan akun workspace";
       accountMenu.setAttribute("aria-expanded", String(cloudActive && accountPanelOpen));
     }
     $("#signedInEmail") && ( $("#signedInEmail").textContent = session?.user?.email || "" );

@@ -67,6 +67,8 @@ assert.match(html, /id="accountMenuBtn"/, 'Compact workspace menu control is mis
 assert.match(cloud, /ACTIVE_WORKSPACE_KEY/, 'Selected workspace must be remembered per account');
 assert.match(cloud, /classList\.toggle\("hidden", cloudActive && !accountPanelOpen\)/,
   'The account panel should collapse after a workspace is active');
+assert.match(cloud, /accountMenu\.textContent = cloudActive \? "Akun \/ Login" : "Login"/,
+  'The compact menu must make account and login controls visible after sign-in');
 assert.match(css, /body\.cloud-active \.mode-notice\s*\{\s*display:none !important;/,
   'The cloud status banner must not take space above the active SPK view');
 assert.match(cloud, /event === "TOKEN_REFRESHED"[\s\S]*?return;/, 'Token refresh must not reload memberships or reset the editor');
