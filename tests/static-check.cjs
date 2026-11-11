@@ -195,7 +195,7 @@ assert.match(deliveryMigration, /private\.is_workspace_member\(workspace_id\)/);
 assert.match(deliveryMigration, /revoke all on table public\.delivery_note_records from public, anon/);
 assert.match(delivery, /const LOGO_STORAGE_KEY = "spk_generator_logos_v1"/,
   'Delivery note must reuse the same SPK logo storage');
-assert.match(delivery, /BRAND_BY_SLOT = \\{ 1: "UNITEE", 2: "FORME", 3: "RYTMO", 4: "VENTURO" \\}/,
+assert.ok(delivery.includes('const BRAND_BY_SLOT = { 1: "UNITEE", 2: "FORME", 3: "RYTMO", 4: "VENTURO" };'),
   'Delivery note logo choices must include the four SPK brands in slot order');
 assert.match(delivery, /logo_id: selectedSpkLogo\\(\\)\\?\\.id/,
   'Delivery note must persist the selected SPK logo identity');
