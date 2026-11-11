@@ -195,7 +195,7 @@ assert.match(deliveryMigration, /revoke all on table public\.delivery_note_recor
 assert.ok(css.includes('@page delivery-a4 { size: A4 portrait; margin: 0; }'),
   'Delivery note print must use A4 portrait page settings');
 const deliveryPrintRule = printRuleBody(css, 'body.delivery-mode #deliveryPrintDocument');
-assert.match(deliveryPrintRule, /page:\\s*delivery-a4;/,
+assert.ok(deliveryPrintRule.includes('page: delivery-a4;'),
   'Delivery note preview must use its named A4 print page');
 assert.ok(build.includes("'accessories.js'"), 'GitHub Pages build must include the accessory module');
 
