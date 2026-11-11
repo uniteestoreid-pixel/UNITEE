@@ -199,6 +199,19 @@ assert.ok(delivery.includes('const BRAND_BY_SLOT = { 1: "UNITEE", 2: "FORME", 3:
   'Delivery note logo choices must include the four SPK brands in slot order');
 assert.ok(delivery.includes('logo_id: selectedSpkLogo()?.id'),
   'Delivery note must persist the selected SPK logo identity');
+const deliveryLogoPickerPosition = html.indexOf('id="delLogoKey"');
+const deliveryPreviewCardPosition = html.indexOf('class="delivery-preview-card"');
+const deliveryEditorEndPosition = html.indexOf('<aside class="delivery-side">', html.indexOf('id="deliveryPage"'));
+assert.ok(deliveryLogoPickerPosition > deliveryPreviewCardPosition && deliveryLogoPickerPosition > deliveryEditorEndPosition,
+  'Delivery logo selection must sit in the Surat Jalan preview toolbar, not the editor');
+assert.match(html, /class="delivery-logo-picker"[\\s\\S]*?option value="">Pilih logo<\\/option>/,
+  'Delivery logo selection must use the native picker placeholder');
+assert.match(css, /\\.delivery-logo-picker select/,
+  'Delivery preview must style the native logo selector');
+assert.match(html, /<img id="delPreviewLogo" alt="Logo usaha" hidden>/,
+  'Selected business logo must render in the document header');
+assert.match(css, /\\.delivery-signatures \\{[\\s\\S]*?justify-content: space-between/,
+  'The two signature blocks must remain aligned at the bottom across the page');
 assert.match(deliveryLogoMigration, /add column if not exists logo_id text/);
 assert.match(deliveryLogoMigration, /add column if not exists logo_label text/);
 assert.ok(css.includes('@page delivery-a4 { size: A4 portrait; margin: 0; }'),
