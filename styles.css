@@ -898,6 +898,7 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
   outline: 2px solid rgb(37 99 235 / 16%); border-color: #7b9fe8;
 }
 .delivery-sheet {
+  display: flex; flex-direction: column;
   width: 100%; min-height: 720px; margin: 0 auto; padding: 26px 24px 24px;
   border: 1px solid #d5dbe2; background: #fff; color: #111;
   box-shadow: 0 3px 14px rgb(0 0 0 / 7%);
@@ -926,8 +927,8 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
 .delivery-total-label { text-align: right; padding-right: 9px !important; }
 .delivery-total-value { text-align: center; }
 .delivery-signatures {
-  display: flex; justify-content: space-between; gap: 20px; text-align: center;
-  margin-top: 16px; padding: 0 18px; font-size: 8pt; font-weight: 700;
+  display: flex; justify-content: center; gap: 45mm; text-align: center;
+  margin-top: auto; padding: 0; font-size: 8pt; font-weight: 700;
   break-inside: avoid; page-break-inside: avoid;
 }
 .delivery-signature { width: 160px; max-width: 42%; display: flex; flex-direction: column; align-items: stretch; }
@@ -978,8 +979,9 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
     background: #fff !important; overflow: visible !important;
   }
   body.delivery-mode #deliveryPrintDocument {
-    page: delivery-a4; display: block !important; width: 210mm; max-width: none;
-    min-height: 297mm; height: auto; margin: 0; padding: 15mm 16mm 14mm;
+    page: delivery-a4; display: flex !important; flex-direction: column;
+    width: 210mm; max-width: none; min-height: 297mm; height: auto;
+    margin: 0; padding: 15mm 16mm 14mm;
     box-sizing: border-box; border: 0; box-shadow: none;
     background: #fff; overflow: visible; color: #111; font-size: 10.5pt;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
@@ -997,7 +999,9 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
   body.delivery-mode .delivery-print-table th, body.delivery-mode .delivery-print-table td {
     overflow-wrap: anywhere; white-space: normal; padding: 0 2px;
   }
-  body.delivery-mode .delivery-signatures { margin-top: 14px; padding: 0 18px; }
+  body.delivery-mode .delivery-signatures {
+    margin-top: auto; justify-content: center; gap: 45mm; padding: 0;
+  }
   body.delivery-mode .delivery-signature span { min-height: 20px; margin-top: 30px; }
 }
 @media (max-width: 1100px) {
