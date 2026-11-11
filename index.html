@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f4f6f8">
   <title>SPK Generator</title>
-  <link rel="stylesheet" href="styles.css?v=20261111-delivery-logo-sync">
+  <link rel="stylesheet" href="styles.css?v=20261111-delivery-preview-logo-picker">
 </head>
 <body>
   <header class="app-header">
@@ -316,11 +316,6 @@
           <label class="delivery-field">Jenis usaha<input id="delBusinessType" maxlength="200" value="Jersey Lari &amp; Apparel Olahraga"></label>
           <label class="delivery-field">Nomor WhatsApp<input id="delBusinessWhatsapp" maxlength="80" value="085168185318"></label>
           <label class="delivery-field delivery-field-wide">Alamat usaha<input id="delBusinessAddress" maxlength="500" value="Jl. Watubelang 01, Noborejo, Salatiga."></label>
-          <label class="delivery-field">Pilih logo
-            <select id="delLogoKey" aria-label="Pilih logo yang sama dengan pilihan logo SPK">
-              <option value="">Memuat logo SPK…</option>
-            </select>
-          </label>
         </div>
 
         <div class="delivery-section-head"><div><p class="eyebrow">PENGIRIMAN</p><h2>Tujuan surat jalan</h2></div></div>
@@ -356,9 +351,16 @@
 
       <aside class="delivery-side">
         <section class="delivery-preview-card">
-          <div class="delivery-card-head">
+          <div class="delivery-card-head delivery-preview-toolbar">
             <div><p class="eyebrow">DOKUMEN</p><h2>Pratinjau Surat Jalan</h2></div>
-            <span class="delivery-count">A4 · Portrait</span>
+            <div class="delivery-preview-tools">
+              <label class="delivery-logo-picker" aria-label="Pilih logo untuk dokumen Surat Jalan">
+                <select id="delLogoKey" aria-label="Pilih logo yang sama dengan pilihan logo SPK">
+                  <option value="">Pilih logo</option>
+                </select>
+              </label>
+              <span class="delivery-count">A4 · Portrait</span>
+            </div>
           </div>
           <article id="deliveryPrintDocument" class="delivery-sheet">
             <div class="delivery-top">
