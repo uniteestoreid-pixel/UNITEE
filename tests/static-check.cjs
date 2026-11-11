@@ -34,7 +34,7 @@ const missingSelectors = [...new Set([...selectorIds(script), ...selectorIds(clo
   .filter(id => !availableIds.has(id));
 assert.deepEqual(missingSelectors, [], 'JavaScript references HTML IDs that do not exist');
 
-assert.match(html, /href=["']styles\.css["']/, 'Stylesheet link is missing');
+assert.match(html, /href=["']styles\.css(?:\?[^"']*)?["']/, 'Stylesheet link is missing');
 const configIndex = html.indexOf('src="config.js"');
 const cloudIndex = html.search(/src="cloud\.js(?:\?[^\"]*)?"/);
 const accessoriesIndex = html.indexOf('src="accessories.js"');
