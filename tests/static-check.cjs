@@ -42,6 +42,8 @@ const scriptIndex = html.indexOf('src="script.js"');
 assert.ok(configIndex >= 0 && configIndex < cloudIndex && cloudIndex < accessoriesIndex && accessoriesIndex < scriptIndex,
   'Client scripts must load in config.js -> cloud.js -> accessories.js -> script.js order');
 assert.match(css, /@media\s+print/i, 'Print CSS is missing');
+assert.match(css, /\.app-header, \.page-nav, \.cloud-panel, \.editor, \.preview-toolbar, \.toast, \.mode-notice \\{ display: none !important; \\}/,
+  'Print output must hide module navigation and account chrome before rendering the SPK');
 assert.match(script, /async function preparePrintImages\(/, 'Print must wait for document images');
 assert.match(script, /images\.map\(image => waitForImageReady\(image\)\)/, 'Print image wait callback must pass the image element');
 assert.match(css, /\.spk \.size-list-group\s*\{[^}]*break-inside:\s*avoid/s, 'Print size groups should stay together');
