@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f4f6f8">
   <title>SPK Generator</title>
-  <link rel="stylesheet" href="styles.css?v=20261111-delivery-signature-bottom">
+  <link rel="stylesheet" href="styles.css?v=20261111-delivery-name-under-line">
 </head>
 <body>
   <header class="app-header">
@@ -388,8 +388,16 @@
               <tfoot><tr><td colspan="2" class="delivery-total-label">TOTAL</td><td class="delivery-total-value" id="delPreviewTotal">0</td><td></td></tr></tfoot>
             </table>
             <div class="delivery-signatures">
-              <div class="delivery-signature"><strong>Yang Menerima,</strong><span id="delPreviewReceivedBy"></span><small>( nama jelas )</small></div>
-              <div class="delivery-signature"><strong>Hormat kami,</strong><span id="delPreviewSenderName"></span><small>( nama jelas )</small></div>
+              <div class="delivery-signature">
+                <strong>Yang Menerima,</strong>
+                <span class="delivery-signature-line" aria-hidden="true"></span>
+                <small id="delPreviewReceivedBy">( nama jelas )</small>
+              </div>
+              <div class="delivery-signature">
+                <strong>Hormat kami,</strong>
+                <span class="delivery-signature-line" aria-hidden="true"></span>
+                <small id="delPreviewSenderName">( nama jelas )</small>
+              </div>
             </div>
           </article>
         </section>
