@@ -5,7 +5,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 
-for (const file of ['index.html', 'styles.css', 'script.js', 'cloud.js', 'config.js', 'build-config.cjs', 'package.json', 'accessories.js', 'delivery.js', 'supabase/migrations/20261031111600_add_accessory_spk_module.sql', 'supabase/migrations/20261111034000_add_delivery_note_module.sql']) {
+for (const file of ['index.html', 'styles.css', 'script.js', 'cloud.js', 'config.js', 'build-config.cjs', 'package.json', 'accessories.js', 'delivery.js', 'supabase/migrations/20261031111600_add_accessory_spk_module.sql', 'supabase/migrations/20261111034000_add_delivery_note_module.sql', 'supabase/migrations/20261111040000_add_delivery_note_logo_selection.sql']) {
   assert.ok(fs.existsSync(path.join(root, file)), 'Missing required file: ' + file);
 }
 
@@ -17,6 +17,7 @@ const accessories = read('accessories.js');
 const delivery = read('delivery.js');
 const accessoryMigration = read('supabase/migrations/20261031111600_add_accessory_spk_module.sql');
 const deliveryMigration = read('supabase/migrations/20261111034000_add_delivery_note_module.sql');
+const deliveryLogoMigration = read('supabase/migrations/20261111040000_add_delivery_note_logo_selection.sql');
 const config = read('config.js');
 const build = read('build-config.cjs');
 const migration = read('supabase/migrations/20261028074039_initial_spk_generator_schema.sql');
@@ -192,6 +193,14 @@ assert.match(delivery, /window\.print\(\)/, 'Draft delivery notes must remain pr
 assert.match(deliveryMigration, /alter table public\.delivery_note_records enable row level security/);
 assert.match(deliveryMigration, /private\.is_workspace_member\(workspace_id\)/);
 assert.match(deliveryMigration, /revoke all on table public\.delivery_note_records from public, anon/);
+assert.match(delivery, /const LOGO_STORAGE_KEY = "spk_generator_logos_v1"/,
+  'Delivery note must reuse the same SPK logo storage');
+assert.match(delivery, /BRAND_BY_SLOT = \\{ 1: "UNITEE", 2: "FORME", 3: "RYTMO", 4: "VENTURO" \\}/,
+  'Delivery note logo choices must include the four SPK brands in slot order');
+assert.match(delivery, /logo_id: selectedSpkLogo\\(\\)\\?\\.id/,
+  'Delivery note must persist the selected SPK logo identity');
+assert.match(deliveryLogoMigration, /add column if not exists logo_id text/);
+assert.match(deliveryLogoMigration, /add column if not exists logo_label text/);
 assert.ok(css.includes('@page delivery-a4 { size: A4 portrait; margin: 0; }'),
   'Delivery note print must use A4 portrait page settings');
 const deliveryPrintRule = printRuleBody(css, 'body.delivery-mode #deliveryPrintDocument');
