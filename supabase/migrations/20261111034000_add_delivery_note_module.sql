@@ -8,6 +8,8 @@ create table if not exists public.delivery_note_records (
   business_address text not null default '' check (char_length(business_address) <= 500),
   business_whatsapp text not null default '' check (char_length(business_whatsapp) <= 80),
   logo_key text not null default '' check (logo_key in ('', 'venturo', 'unitee', 'forme', 'rytmo')),
+  logo_id text,
+  logo_label text not null default '' check (char_length(logo_label) <= 40),
   city text not null default '' check (char_length(city) <= 120),
   delivery_date date,
   recipient_name text not null default '' check (char_length(recipient_name) <= 200),
