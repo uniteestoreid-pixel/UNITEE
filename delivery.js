@@ -68,7 +68,7 @@
     select.replaceChildren();
     const placeholder = document.createElement("option");
     placeholder.value = "";
-    placeholder.textContent = logos.length ? "Tanpa logo" : "Logo belum tersedia";
+    placeholder.textContent = "Pilih logo";
     select.append(placeholder);
     logos.forEach(logo => {
       const option = document.createElement("option");
@@ -552,7 +552,7 @@
       $("#deliveryPageTab").setAttribute("aria-selected", "false");
     });
     $("#deliveryEditor").addEventListener("input", updatePreview);
-    $("#deliveryEditor").addEventListener("change", () => { renderLogoChoices(value("#delLogoKey")); updatePreview(); });
+    $("#delLogoKey").addEventListener("change", updatePreview);
     $("#deliveryAddItemBtn").addEventListener("click", () => {
       if ($("#deliveryItemRows").children.length >= 50) { status("Maksimal 50 baris barang.", true); return; }
       addItemRow();
