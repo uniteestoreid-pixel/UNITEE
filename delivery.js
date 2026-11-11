@@ -294,6 +294,11 @@
       .limit(100);
     if (result.error) throw result.error;
     if (!contextStillMatches(context) || token !== state.loadToken) return;
+    const contextChanged = Boolean(
+      (state.currentWorkspaceId && state.currentWorkspaceId !== context.workspaceId)
+      || (state.currentUserId && state.currentUserId !== context.userId)
+    );
+    if (contextChanged) startNew(false);
     state.records = result.data || [];
     state.currentWorkspaceId = context.workspaceId;
     state.currentUserId = context.userId;
@@ -530,11 +535,12 @@
     if (isCloudReady()) loadRecords().catch(error => status(errorMessage(error), true));
     else {
       state.loadToken++;
+      const hadCloudContext = Boolean(state.currentWorkspaceId || state.currentUserId || state.activeId);
       state.records = [];
       state.currentWorkspaceId = null;
       state.currentUserId = null;
       renderHistory();
-      if (state.activeId) startNew(false);
+      if (hadCloudContext) startNew(false);
       status("Login dan pilih workspace untuk menyimpan serta membuka arsip Surat Jalan. Cetak/PDF tetap tersedia.", true);
     }
   });
