@@ -932,8 +932,14 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
   break-inside: avoid; page-break-inside: avoid;
 }
 .delivery-signature { width: 160px; max-width: 42%; display: flex; flex-direction: column; align-items: stretch; }
-.delivery-signature span { min-height: 42px; margin-top: 30px; border-bottom: 1px dotted #555; font-weight: 400; }
-.delivery-signature small { margin-top: 4px; font-size: 8pt; font-weight: 400; }
+.delivery-signature-line {
+  display: block; min-height: 42px; margin-top: 30px;
+  border-bottom: 1px dotted #555;
+}
+.delivery-signature small {
+  display: block; min-height: 12px; margin-top: 4px;
+  font-size: 8pt; font-weight: 400; overflow-wrap: anywhere;
+}
 .delivery-history { display: grid; gap: 8px; }
 .delivery-history-row {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -1002,7 +1008,8 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
   body.delivery-mode .delivery-signatures {
     margin-top: auto; justify-content: center; gap: 45mm; padding: 0;
   }
-  body.delivery-mode .delivery-signature span { min-height: 20px; margin-top: 30px; }
+  body.delivery-mode .delivery-signature-line { min-height: 20px; margin-top: 30px; }
+  body.delivery-mode .delivery-signature small { min-height: 12px; margin-top: 4px; }
 }
 @media (max-width: 1100px) {
   .delivery-layout { grid-template-columns: 1fr; }
