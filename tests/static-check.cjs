@@ -5,7 +5,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 
-for (const file of ['index.html', 'styles.css', 'script.js', 'cloud.js', 'config.js', 'build-config.cjs', 'package.json', 'accessories.js', 'supabase/migrations/20261031111600_add_accessory_spk_module.sql']) {
+for (const file of ['index.html', 'styles.css', 'script.js', 'cloud.js', 'config.js', 'build-config.cjs', 'package.json', 'accessories.js', 'delivery.js', 'supabase/migrations/20261031111600_add_accessory_spk_module.sql', 'supabase/migrations/20261111034000_add_delivery_note_module.sql']) {
   assert.ok(fs.existsSync(path.join(root, file)), 'Missing required file: ' + file);
 }
 
@@ -14,7 +14,9 @@ const css = read('styles.css');
 const script = read('script.js');
 const cloud = read('cloud.js');
 const accessories = read('accessories.js');
+const delivery = read('delivery.js');
 const accessoryMigration = read('supabase/migrations/20261031111600_add_accessory_spk_module.sql');
+const deliveryMigration = read('supabase/migrations/20261111034000_add_delivery_note_module.sql');
 const config = read('config.js');
 const build = read('build-config.cjs');
 const migration = read('supabase/migrations/20261028074039_initial_spk_generator_schema.sql');
@@ -27,10 +29,13 @@ assert.equal(new Set(ids).size, ids.length, 'Duplicate HTML IDs found');
 assert.match(html, /id="spkPageTab"/);
 assert.match(html, /id="accessoryPageTab"/);
 assert.match(html, /id="accessoryPage"/);
+assert.match(html, /id="deliveryPageTab"/);
+assert.match(html, /id="deliveryPage"/);
+assert.match(html, /src="delivery\.js/);
 assert.match(html, /src="accessories\.js"/);
 const selectorIds = source => [...source.matchAll(/\$\(\s*["']#([\w-]+)["']\s*\)/g)].map(match => match[1]);
 const availableIds = new Set(ids);
-const missingSelectors = [...new Set([...selectorIds(script), ...selectorIds(cloud), ...selectorIds(accessories)])]
+const missingSelectors = [...new Set([...selectorIds(script), ...selectorIds(cloud), ...selectorIds(accessories), ...selectorIds(delivery)])]
   .filter(id => !availableIds.has(id));
 assert.deepEqual(missingSelectors, [], 'JavaScript references HTML IDs that do not exist');
 
@@ -174,6 +179,21 @@ assert.ok(html.indexOf('src="accessories.js"') < html.indexOf('src="script.js"')
   'Accessory script must load before the original SPK script');
 assert.ok(pkg.scripts?.check?.includes('node --check accessories.js'),
   'The accessory module must be syntax-checked');
+assert.ok(pkg.scripts?.check?.includes('node --check delivery.js'),
+  'The Surat Jalan module must be syntax-checked');
+assert.ok(build.includes("'delivery.js'"), 'GitHub Pages build must include the Surat Jalan module');
+assert.match(delivery, /const TABLE = "delivery_note_records"/);
+assert.match(delivery, /\.eq\("workspace_id", context\.workspaceId\)/, 'Delivery note reads must be scoped to the active workspace');
+assert.match(delivery, /\.eq\("version", previousVersion\)/, 'Delivery note updates must detect concurrent edits');
+assert.match(delivery, /deleted_at/, 'Delivery note archives must use soft-delete');
+assert.match(delivery, /window\.print\(\)/, 'Draft delivery notes must remain printable without saving');
+assert.match(deliveryMigration, /alter table public\.delivery_note_records enable row level security/);
+assert.match(deliveryMigration, /private\.is_workspace_member\(workspace_id\)/);
+assert.match(deliveryMigration, /revoke all on table public\.delivery_note_records from public, anon/);
+assert.match(css, /@page delivery-a4 \\{ size: A4 portrait; margin: 0; \\}/,
+  'Delivery note print must use A4 portrait page settings');
+assert.match(css, /body\\.delivery-mode #deliveryPrintDocument \\{[^}]*page: delivery-a4;/s,
+  'Delivery note preview must use its named A4 print page');
 assert.ok(build.includes("'accessories.js'"), 'GitHub Pages build must include the accessory module');
 
 console.log('Static checks passed: UI selectors, A4 accessory pagination, workspace isolation, autosave recovery, and private Supabase access.');
