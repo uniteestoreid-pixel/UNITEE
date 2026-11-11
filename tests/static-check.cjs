@@ -192,9 +192,10 @@ assert.match(delivery, /window\.print\(\)/, 'Draft delivery notes must remain pr
 assert.match(deliveryMigration, /alter table public\.delivery_note_records enable row level security/);
 assert.match(deliveryMigration, /private\.is_workspace_member\(workspace_id\)/);
 assert.match(deliveryMigration, /revoke all on table public\.delivery_note_records from public, anon/);
-assert.match(css, /@page delivery-a4 \\{ size: A4 portrait; margin: 0; \\}/,
+assert.ok(css.includes('@page delivery-a4 { size: A4 portrait; margin: 0; }'),
   'Delivery note print must use A4 portrait page settings');
-assert.match(css, /body\\.delivery-mode #deliveryPrintDocument \\{[^}]*page: delivery-a4;/s,
+const deliveryPrintRule = printRuleBody(css, 'body.delivery-mode #deliveryPrintDocument');
+assert.match(deliveryPrintRule, /page:\\s*delivery-a4;/,
   'Delivery note preview must use its named A4 print page');
 assert.ok(build.includes("'accessories.js'"), 'GitHub Pages build must include the accessory module');
 
