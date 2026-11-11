@@ -904,8 +904,8 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
   font-family: Arial, Helvetica, sans-serif; font-size: 10.5pt;
 }
 .delivery-top { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: start; }
-.delivery-brand { min-width: 0; display: flex; align-items: flex-start; gap: 10px; }
-.delivery-brand > img { display: block; width: 110px; height: 58px; max-width: 42%; object-fit: contain; object-position: left top; }
+.delivery-brand { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.delivery-brand > img { display: block; width: 150px; height: 64px; max-width: 100%; object-fit: contain; object-position: left top; }
 .delivery-brand > img[hidden] { display: none; }
 .delivery-brand-copy { min-width: 0; display: grid; gap: 4px; font-size: 9px; line-height: 1.45; overflow-wrap: anywhere; }
 .delivery-contact { display: flex; gap: 5px; align-items: center; }
