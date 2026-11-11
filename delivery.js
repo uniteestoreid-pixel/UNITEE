@@ -226,8 +226,8 @@
     text("#delPreviewAddress1", value("#delAddress1"));
     text("#delPreviewAddress2", value("#delAddress2"));
     text("#delPreviewNumber", $("#deliveryNumber").textContent);
-    text("#delPreviewReceivedBy", value("#delReceivedBy"));
-    text("#delPreviewSenderName", value("#delSenderName"));
+    text("#delPreviewReceivedBy", value("#delReceivedBy") || "( nama jelas )");
+    text("#delPreviewSenderName", value("#delSenderName") || "( nama jelas )");
     const selectedLogo = selectedSpkLogo();
     const logo = $("#delPreviewLogo");
     if (selectedLogo?.dataUrl) {
