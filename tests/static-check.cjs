@@ -210,8 +210,12 @@ assert.ok(css.includes('.delivery-logo-picker select {'),
   'Delivery preview must style the native logo selector');
 assert.ok(html.includes('<img id="delPreviewLogo" alt="Logo usaha" hidden>'),
   'Selected business logo must render in the document header');
-assert.ok(css.includes('.delivery-signatures {') && css.includes('justify-content: space-between'),
-  'The two signature blocks must remain aligned at the bottom across the page');
+assert.ok(css.includes('.delivery-sheet {\\n  display: flex; flex-direction: column;'),
+  'The Surat Jalan preview must reserve vertical space for the signature block');
+assert.ok(css.includes('.delivery-signatures {') && css.includes('margin-top: auto') && css.includes('justify-content: center'),
+  'The signature blocks must sit centered at the bottom of the document');
+assert.ok(css.includes('body.delivery-mode .delivery-signatures {\\n    margin-top: auto; justify-content: center;'),
+  'Printed Surat Jalan signatures must remain centered at the page bottom');
 assert.match(deliveryLogoMigration, /add column if not exists logo_id text/);
 assert.match(deliveryLogoMigration, /add column if not exists logo_label text/);
 assert.ok(css.includes('@page delivery-a4 { size: A4 portrait; margin: 0; }'),
