@@ -3,12 +3,8 @@
 
   const TABLE = "delivery_note_records";
   const $ = selector => document.querySelector(selector);
-  const LOGOS = {
-    venturo: "https://cdn.imagetourls.com/uploads/tyImg/85JRgOdI.png",
-    unitee: "https://cdn.imagetourls.com/uploads/tyImg/Puo00N7a.png",
-    forme: "https://cdn.imagetourls.com/uploads/tyImg/15137IkCT.png",
-    rytmo: "https://cdn.imagetourls.com/uploads/tyImg/ANKg85ya.png"
-  };
+  const LOGO_STORAGE_KEY = "spk_generator_logos_v1";
+  const BRAND_BY_SLOT = { 1: "UNITEE", 2: "FORME", 3: "RYTMO", 4: "VENTURO" };
   const state = {
     records: [], activeId: null, version: 0,
     currentWorkspaceId: null, currentUserId: null,
@@ -40,6 +36,49 @@
     const random = (globalThis.crypto?.randomUUID?.() || Math.random().toString(36).slice(2)).replace(/-/g, "").slice(0, 4).toUpperCase();
     return "SJ-" + date + "-" + random;
   }
+  function getSpkLogos() {
+    try {
+      const list = JSON.parse(localStorage.getItem(LOGO_STORAGE_KEY) || "[]");
+      if (!Array.isArray(list)) return [];
+      return list.filter(logo => logo && typeof logo.id === "string" && (logo.active === true || logo.dataUrl || logo.storagePath))
+        .slice(0, 4)
+        .map((logo, index) => {
+          const slot = Number(logo.slot) || index + 1;
+          const rawLabel = String(logo.label || "").trim();
+          const genericLabel = !rawLabel || /^logo\\s*\\d*$/i.test(rawLabel);
+          return {
+            id: logo.id,
+            label: genericLabel ? (BRAND_BY_SLOT[slot] || "Logo " + slot) : rawLabel,
+            dataUrl: typeof logo.dataUrl === "string" ? logo.dataUrl : "",
+            storagePath: typeof logo.storagePath === "string" ? logo.storagePath : null,
+            slot
+          };
+        });
+    } catch {
+      return [];
+    }
+  }
+  function selectedSpkLogo() {
+    return getSpkLogos().find(logo => logo.id === value("#delLogoKey")) || null;
+  }
+  function renderLogoChoices(selectedId = value("#delLogoKey")) {
+    const select = $("#delLogoKey");
+    const logos = getSpkLogos();
+    const previous = selectedId;
+    select.replaceChildren();
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = logos.length ? "Tanpa logo" : "Logo belum tersedia";
+    select.append(placeholder);
+    logos.forEach(logo => {
+      const option = document.createElement("option");
+      option.value = logo.id;
+      option.textContent = logo.label;
+      select.append(option);
+    });
+    select.value = logos.some(logo => logo.id === previous) ? previous : "";
+  }
+
   function status(message, error = false) {
     const node = $("#deliveryStatus");
     if (!node) return;
@@ -189,11 +228,11 @@
     text("#delPreviewNumber", $("#deliveryNumber").textContent);
     text("#delPreviewReceivedBy", value("#delReceivedBy"));
     text("#delPreviewSenderName", value("#delSenderName"));
-    const logoKey = value("#delLogoKey");
+    const selectedLogo = selectedSpkLogo();
     const logo = $("#delPreviewLogo");
-    if (logoKey && LOGOS[logoKey]) {
-      logo.src = LOGOS[logoKey];
-      logo.alt = "Logo " + logoKey;
+    if (selectedLogo?.dataUrl) {
+      logo.src = selectedLogo.dataUrl;
+      logo.alt = "Logo " + selectedLogo.label;
       logo.hidden = false;
     } else {
       logo.removeAttribute("src");
@@ -211,7 +250,7 @@
     $("#delBusinessType").value = "Jersey Lari & Apparel Olahraga";
     $("#delBusinessAddress").value = "Jl. Watubelang 01, Noborejo, Salatiga.";
     $("#delBusinessWhatsapp").value = "085168185318";
-    $("#delLogoKey").value = "rytmo";
+    renderLogoChoices("");
     $("#delCity").value = "";
     $("#delDate").value = localDateIso();
     $("#delRecipient").value = "";
@@ -261,7 +300,9 @@
       business_type: value("#delBusinessType"),
       business_address: value("#delBusinessAddress"),
       business_whatsapp: value("#delBusinessWhatsapp"),
-      logo_key: value("#delLogoKey"),
+      logo_key: (selectedSpkLogo()?.label || "").toLocaleLowerCase("id-ID").replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""),
+      logo_id: selectedSpkLogo()?.id || null,
+      logo_label: selectedSpkLogo()?.label || "",
       city: value("#delCity"),
       delivery_date: value("#delDate") || null,
       recipient_name: value("#delRecipient"),
@@ -360,7 +401,7 @@
     $("#delBusinessType").value = record.business_type || "";
     $("#delBusinessAddress").value = record.business_address || "";
     $("#delBusinessWhatsapp").value = record.business_whatsapp || "";
-    $("#delLogoKey").value = record.logo_key || "";
+    renderLogoChoices(record.logo_id || "");
     $("#delCity").value = record.city || "";
     $("#delDate").value = record.delivery_date || "";
     $("#delRecipient").value = record.recipient_name || "";
@@ -511,7 +552,7 @@
       $("#deliveryPageTab").setAttribute("aria-selected", "false");
     });
     $("#deliveryEditor").addEventListener("input", updatePreview);
-    $("#deliveryEditor").addEventListener("change", updatePreview);
+    $("#deliveryEditor").addEventListener("change", () => { renderLogoChoices(value("#delLogoKey")); updatePreview(); });
     $("#deliveryAddItemBtn").addEventListener("click", () => {
       if ($("#deliveryItemRows").children.length >= 50) { status("Maksimal 50 baris barang.", true); return; }
       addItemRow();
@@ -532,6 +573,9 @@
   bind();
   startNew(false);
   window.addEventListener("spkcloud:loaded", () => {
+    const selectedLogoId = value("#delLogoKey");
+    renderLogoChoices(selectedLogoId);
+    updatePreview();
     if (isCloudReady()) loadRecords().catch(error => status(errorMessage(error), true));
     else {
       state.loadToken++;
