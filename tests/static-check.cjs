@@ -120,7 +120,9 @@ assert.match(build, /SUPABASE_URL/, 'Build must read SUPABASE_URL');
 assert.match(build, /SUPABASE_ANON_KEY/, 'Build must read SUPABASE_ANON_KEY');
 assert.equal(pkg.scripts?.build, 'node build-config.cjs', 'Unexpected build command');
 
-const accessoryPrintStart = css.lastIndexOf('@media print {');
+const deliveryStyleMarker = css.indexOf('/* Surat Jalan module:');
+assert.ok(deliveryStyleMarker > 0, 'Delivery module CSS marker is missing');
+const accessoryPrintStart = css.lastIndexOf('@media print {', deliveryStyleMarker);
 const accessoryPrintEnd = css.indexOf('\n@media (max-width: 980px)', accessoryPrintStart);
 const accessoryPrintCss = css.slice(accessoryPrintStart, accessoryPrintEnd < 0 ? undefined : accessoryPrintEnd);
 const printRuleBody = (source, selector) => {
