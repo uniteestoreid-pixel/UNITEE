@@ -216,6 +216,13 @@ assert.ok(css.includes('.delivery-signatures {') && css.includes('margin-top: au
   'The signature blocks must sit centered at the bottom of the document');
 assert.ok(css.includes('body.delivery-mode .delivery-signatures {') && css.includes('margin-top: auto; justify-content: center;'),
   'Printed Surat Jalan signatures must remain centered at the page bottom');
+assert.ok(html.includes('<span class="delivery-signature-line" aria-hidden="true"></span>'),
+  'Signature ink lines must stay blank for handwritten signatures');
+assert.ok(html.includes('<small id="delPreviewReceivedBy">( nama jelas )</small>') && html.includes('<small id="delPreviewSenderName">( nama jelas )</small>'),
+  'Entered recipient and sender names must print below the signature lines');
+assert.ok(delivery.includes('text("#delPreviewReceivedBy", value("#delReceivedBy") || "( nama jelas )")') &&
+  delivery.includes('text("#delPreviewSenderName", value("#delSenderName") || "( nama jelas )")'),
+  'Entered signature names must replace the explanatory name labels');
 assert.match(deliveryLogoMigration, /add column if not exists logo_id text/);
 assert.match(deliveryLogoMigration, /add column if not exists logo_label text/);
 assert.ok(css.includes('@page delivery-a4 { size: A4 portrait; margin: 0; }'),
