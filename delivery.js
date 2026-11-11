@@ -45,7 +45,7 @@
         .map((logo, index) => {
           const slot = Number(logo.slot) || index + 1;
           const rawLabel = String(logo.label || "").trim();
-          const genericLabel = !rawLabel || /^logo\\s*\\d*$/i.test(rawLabel);
+          const genericLabel = !rawLabel || /^logo\s*\d*$/i.test(rawLabel);
           return {
             id: logo.id,
             label: genericLabel ? (BRAND_BY_SLOT[slot] || "Logo " + slot) : rawLabel,
@@ -300,7 +300,7 @@
       business_type: value("#delBusinessType"),
       business_address: value("#delBusinessAddress"),
       business_whatsapp: value("#delBusinessWhatsapp"),
-      logo_key: (selectedSpkLogo()?.label || "").toLocaleLowerCase("id-ID").replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""),
+      logo_key: ({ 1: "unitee", 2: "forme", 3: "rytmo", 4: "venturo" })[selectedSpkLogo()?.slot] || "",
       logo_id: selectedSpkLogo()?.id || null,
       logo_label: selectedSpkLogo()?.label || "",
       city: value("#delCity"),
