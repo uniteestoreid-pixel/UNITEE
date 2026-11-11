@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f4f6f8">
   <title>SPK Generator</title>
-  <link rel="stylesheet" href="styles.css?v=20261111-print-nav">
+  <link rel="stylesheet" href="styles.css?v=20261111-delivery">
 </head>
 <body>
   <header class="app-header">
@@ -29,6 +29,7 @@
   <nav class="page-nav" id="pageNav" aria-label="Menu utama">
     <button class="page-tab active" id="spkPageTab" type="button" role="tab" aria-selected="true">SPK Produksi · Jersey / Batik</button>
     <button class="page-tab" id="accessoryPageTab" type="button" role="tab" aria-selected="false">SPK Aksesoris UNITEE</button>
+    <button class="page-tab" id="deliveryPageTab" type="button" role="tab" aria-selected="false">Surat Jalan</button>
   </nav>
 
   <div class="mode-notice" id="modeNotice" role="status"><strong>Mode lokal:</strong> arsip tersimpan di browser ini. Konfigurasikan Supabase untuk login dan sinkronisasi multiuser.</div>
@@ -289,12 +290,130 @@
     </div>
   </section>
 
+  
+  <section id="deliveryPage" class="delivery-page" aria-label="Surat Jalan" hidden>
+    <header class="delivery-page-head">
+      <div>
+        <p class="eyebrow">DOKUMEN PENGIRIMAN</p>
+        <h1>Surat Jalan</h1>
+        <p class="delivery-intro">Buat surat jalan A4, pilih logo usaha, isi penerima dan daftar barang, lalu cetak atau simpan PDF. Simpan ke arsip workspace bila perlu dibuka kembali.</p>
+      </div>
+      <div class="delivery-actions">
+        <button class="btn" id="deliveryNewBtn" type="button">Surat Jalan Baru</button>
+        <button class="btn" id="deliveryPrintBtn" type="button">Cetak / Simpan PDF</button>
+        <button class="btn primary" id="deliverySaveBtn" type="button">Simpan Surat Jalan</button>
+      </div>
+    </header>
+    <p id="deliveryStatus" class="delivery-status" role="status" aria-live="polite">Menyiapkan modul surat jalan…</p>
+
+    <div class="delivery-layout">
+      <section class="delivery-editor-card" id="deliveryEditor" aria-label="Form Surat Jalan">
+        <div class="delivery-card-head">
+          <div><p class="eyebrow">FORMULIR</p><h2>Identitas usaha</h2></div>
+          <span class="delivery-number" id="deliveryNumber">SJ-00000000-0000</span>
+        </div>
+        <div class="delivery-form-grid">
+          <label class="delivery-field">Jenis usaha<input id="delBusinessType" maxlength="200" value="Jersey Lari &amp; Apparel Olahraga"></label>
+          <label class="delivery-field">Nomor WhatsApp<input id="delBusinessWhatsapp" maxlength="80" value="085168185318"></label>
+          <label class="delivery-field delivery-field-wide">Alamat usaha<input id="delBusinessAddress" maxlength="500" value="Jl. Watubelang 01, Noborejo, Salatiga."></label>
+          <label class="delivery-field">Pilih logo
+            <select id="delLogoKey">
+              <option value="">Tanpa logo</option>
+              <option value="venturo">Venturo</option>
+              <option value="unitee">Unitee</option>
+              <option value="forme">Forme</option>
+              <option value="rytmo" selected>Rytmo</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="delivery-section-head"><div><p class="eyebrow">PENGIRIMAN</p><h2>Tujuan surat jalan</h2></div></div>
+        <div class="delivery-form-grid">
+          <label class="delivery-field">Kota pengiriman<input id="delCity" maxlength="120" placeholder="Kota"></label>
+          <label class="delivery-field">Tanggal surat jalan<input id="delDate" type="date"></label>
+          <label class="delivery-field delivery-field-wide">Nama penerima / perusahaan<input id="delRecipient" maxlength="200" placeholder="Nama penerima / perusahaan"></label>
+          <label class="delivery-field delivery-field-wide">Alamat penerima<input id="delAddress1" maxlength="300" placeholder="Alamat penerima"></label>
+          <label class="delivery-field delivery-field-wide">Kota / nomor kontak<input id="delAddress2" maxlength="300" placeholder="Kota / nomor kontak"></label>
+        </div>
+
+        <div class="delivery-section-head">
+          <div><p class="eyebrow">DAFTAR BARANG</p><h2>Barang yang dikirim</h2></div>
+          <span class="delivery-count" id="deliveryItemCount">8 baris</span>
+        </div>
+        <div class="delivery-item-head"><span>Nama barang</span><span>Jumlah</span><span>Keterangan</span></div>
+        <div id="deliveryItemRows" class="delivery-item-rows"></div>
+        <div class="delivery-item-actions">
+          <button class="btn" id="deliveryAddItemBtn" type="button">＋ Tambah baris</button>
+          <button class="btn" id="deliveryRemoveItemBtn" type="button">− Hapus baris terakhir</button>
+        </div>
+        <div class="delivery-total-card">Total jumlah barang <strong id="deliveryEditorTotal">0</strong></div>
+
+        <div class="delivery-section-head"><div><p class="eyebrow">PENERIMAAN</p><h2>Tanda tangan</h2></div></div>
+        <div class="delivery-form-grid">
+          <label class="delivery-field">Nama jelas penerima<input id="delReceivedBy" maxlength="200" placeholder="Nama jelas penerima"></label>
+          <label class="delivery-field">Nama jelas pengirim<input id="delSenderName" maxlength="200" placeholder="Nama jelas pengirim"></label>
+        </div>
+        <div class="delivery-footer-actions">
+          <button class="btn" id="deliveryRefreshBtn" type="button">Muat ulang arsip</button>
+        </div>
+      </section>
+
+      <aside class="delivery-side">
+        <section class="delivery-preview-card">
+          <div class="delivery-card-head">
+            <div><p class="eyebrow">DOKUMEN</p><h2>Pratinjau Surat Jalan</h2></div>
+            <span class="delivery-count">A4 · Portrait</span>
+          </div>
+          <article id="deliveryPrintDocument" class="delivery-sheet">
+            <div class="delivery-top">
+              <div class="delivery-brand">
+                <img id="delPreviewLogo" alt="Logo usaha" hidden>
+                <div class="delivery-brand-copy">
+                  <span id="delPreviewBusinessType">Jersey Lari &amp; Apparel Olahraga</span>
+                  <span id="delPreviewBusinessAddress">Jl. Watubelang 01, Noborejo, Salatiga.</span>
+                  <span class="delivery-contact"><span aria-hidden="true">◉</span><span id="delPreviewWhatsapp">085168185318</span></span>
+                </div>
+              </div>
+              <div class="delivery-recipient-block">
+                <div class="delivery-date-row"><span id="delPreviewCity">—</span><span id="delPreviewComma">,</span><strong id="delPreviewDate">—</strong></div>
+                <strong>Kepada Yth.</strong>
+                <b id="delPreviewRecipient">—</b>
+                <span id="delPreviewAddress1">—</span>
+                <span id="delPreviewAddress2">—</span>
+              </div>
+            </div>
+            <h2 class="delivery-doc-title">SURAT JALAN NO. <span id="delPreviewNumber">—</span></h2>
+            <table class="delivery-print-table" aria-label="Daftar barang yang dikirim">
+              <colgroup><col style="width:7%"><col style="width:54%"><col style="width:13%"><col style="width:26%"></colgroup>
+              <thead><tr><th>No.</th><th>Nama Barang</th><th>Jumlah</th><th>Keterangan</th></tr></thead>
+              <tbody id="delPreviewItems"></tbody>
+              <tfoot><tr><td colspan="2" class="delivery-total-label">TOTAL</td><td class="delivery-total-value" id="delPreviewTotal">0</td><td></td></tr></tfoot>
+            </table>
+            <div class="delivery-signatures">
+              <div class="delivery-signature"><strong>Yang Menerima,</strong><span id="delPreviewReceivedBy"></span><small>( nama jelas )</small></div>
+              <div class="delivery-signature"><strong>Hormat kami,</strong><span id="delPreviewSenderName"></span><small>( nama jelas )</small></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="delivery-history-card">
+          <div class="delivery-card-head">
+            <div><p class="eyebrow">WORKSPACE</p><h2>Arsip Surat Jalan</h2></div>
+            <span id="deliveryHistoryCount" class="delivery-count">0 dokumen</span>
+          </div>
+          <div id="deliveryHistory" class="delivery-history"><div class="delivery-empty-state">Login dan pilih workspace untuk melihat arsip.</div></div>
+        </section>
+      </aside>
+    </div>
+  </section>
+
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
   <script src="config.js" defer></script>
   <script src="cloud.js?v=20261031-account-menu" defer></script>
   <script src="accessories.js" defer></script>
+  <script src="delivery.js?v=20261111" defer></script>
   <script src="script.js" defer></script>
 </body>
 </html>
