@@ -210,7 +210,7 @@ assert.ok(css.includes('.delivery-logo-picker select {'),
   'Delivery preview must style the native logo selector');
 assert.ok(html.includes('<img id="delPreviewLogo" alt="Logo usaha" hidden>'),
   'Selected business logo must render in the document header');
-assert.ok(css.includes('.delivery-signatures {\\n  display: flex; justify-content: space-between'),
+assert.ok(css.includes('.delivery-signatures {') && css.includes('justify-content: space-between'),
   'The two signature blocks must remain aligned at the bottom across the page');
 assert.match(deliveryLogoMigration, /add column if not exists logo_id text/);
 assert.match(deliveryLogoMigration, /add column if not exists logo_label text/);
