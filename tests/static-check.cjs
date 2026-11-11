@@ -204,13 +204,13 @@ const deliveryPreviewCardPosition = html.indexOf('class="delivery-preview-card"'
 const deliveryEditorEndPosition = html.indexOf('<aside class="delivery-side">', html.indexOf('id="deliveryPage"'));
 assert.ok(deliveryLogoPickerPosition > deliveryPreviewCardPosition && deliveryLogoPickerPosition > deliveryEditorEndPosition,
   'Delivery logo selection must sit in the Surat Jalan preview toolbar, not the editor');
-assert.match(html, /class="delivery-logo-picker"[\\s\\S]*?option value="">Pilih logo<\\/option>/,
+assert.ok(html.includes('class="delivery-logo-picker"') && html.includes('<option value="">Pilih logo</option>'),
   'Delivery logo selection must use the native picker placeholder');
-assert.match(css, /\\.delivery-logo-picker select/,
+assert.ok(css.includes('.delivery-logo-picker select {'),
   'Delivery preview must style the native logo selector');
-assert.match(html, /<img id="delPreviewLogo" alt="Logo usaha" hidden>/,
+assert.ok(html.includes('<img id="delPreviewLogo" alt="Logo usaha" hidden>'),
   'Selected business logo must render in the document header');
-assert.match(css, /\\.delivery-signatures \\{[\\s\\S]*?justify-content: space-between/,
+assert.ok(css.includes('.delivery-signatures {\\n  display: flex; justify-content: space-between'),
   'The two signature blocks must remain aligned at the bottom across the page');
 assert.match(deliveryLogoMigration, /add column if not exists logo_id text/);
 assert.match(deliveryLogoMigration, /add column if not exists logo_label text/);
