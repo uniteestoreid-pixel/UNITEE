@@ -272,11 +272,11 @@ function updateSizes() {
       const sleeveClass = category.id.endsWith("-panjang")
         ? "size-list-group--long"
         : category.id.endsWith("-3-4") ? "size-list-group--three-quarter" : "size-list-group--short";
-      groups.push(`<div class="size-list-group ${sleeveClass}"><div class="size-list-heading">${sleeve}${audience}</div><div class="size-list-items">${items.map(item => `<span class="size-list-item">${item.size} : ${item.qty} pcs</span>`).join("")}</div></div>`);
+      groups.push(`<div class="size-list-group ${sleeveClass}"><div class="size-list-heading">${sleeve}${audience}</div><div class="size-list-items"><div class="size-list-column-head"><span>UKURAN</span><span>JUMLAH</span></div>${items.map(item => `<div class="size-list-item"><span class="size-label">${item.size}</span><strong class="size-qty">${item.qty} pcs</strong></div>`).join("")}</div></div>`);
     }
   });
   $("#previewSizeBreakdown").innerHTML = groups.length
-    ? groups.join("")
+    ? `${groups.join("")}<div class="size-list-total"><span>TOTAL</span><strong>${total} pcs</strong></div>`
     : '<div class="size-list-empty">Belum ada rincian ukuran.</div>';
   $("#sizeTotal").textContent = total;
   $("#quantity").value = total;
