@@ -88,12 +88,14 @@ assert.match(css, /@media print\s*\{[\s\S]*?\.design-section > \.section-title\s
   'The design section heading must be omitted from the printed page');
 assert.match(css, /\.spk > \.approval-section\s*\{\s*margin-top:\s*auto !important;/,
   'The approval area must be pushed to the bottom of the printed A4 page');
-assert.match(css, /\.detail-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 1\.12fr\)/s,
+assert.match(css, /\.detail-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, \.95fr\) minmax\(0, 1\.12fr\)/s,
   'Print detail order must place order details beside the size breakdown');
 assert.match(css, /\.design-section \+ \.document-section > \.section-title\s*\{[^}]*background:\s*#111/s,
   'Print detail order must use the reference dark title strip');
-assert.match(css, /\.info > div\s*\{[^}]*grid-template-columns:\s*23mm minmax\(0, 1fr\)/s,
+assert.match(css, /\.info > div\s*\{[^}]*grid-template-columns:\s*24mm minmax\(0, 1fr\)/s,
   'Print order fields must use label and value rows');
+assert.match(css, /\.spk \.size-list-group\s*\{[^}]*border:\s*0; border-radius:\s*0; background:\s*transparent/s,
+  'Print sleeve quantity groups must stay compact without card boxes');
 
 assert.match(css, /\.size-list\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s, 'Print sleeve groups should be arranged in two columns');
 assert.match(script, /LENGAN PJG/, 'Long-sleeve size groups must use the compact long-sleeve label');
