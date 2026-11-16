@@ -78,6 +78,10 @@ assert.match(css, /\.design-notes-caption:not\(\[hidden\]\)\s*\{\s*display:\s*bl
   'Production notes must print directly below the design and sleeve illustration');
 assert.match(css, /\.garment-guide-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,/s, 'Automatic garment illustrations must fit in the preview');
 assert.match(css, /\.design-notes-caption\[hidden\]\s*\{\s*display:\s*none/s, 'Empty notes captions must not take space');
+assert.match(css, /@media print\s*\{[\s\S]*?\.design-section > \.section-title\s*\{\s*display:\s*none !important;/,
+  'The design section heading must be omitted from the printed page');
+assert.match(css, /\.spk > \.approval-section\s*\{\s*margin-top:\s*auto !important;/,
+  'The approval area must be pushed to the bottom of the printed A4 page');
 assert.match(css, /\.detail-layout\s*\{[^}]*flex-direction:\s*column/s, 'Print size breakdown must sit below order details');
 assert.match(css, /\.info\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/s, 'Print order details should be arranged horizontally in four columns');
 assert.match(css, /\.info > div\s*\{[^}]*align-items:\s*center; justify-content:\s*center;/s, 'Print order details should be centered');
