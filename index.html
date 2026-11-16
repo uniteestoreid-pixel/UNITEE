@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f4f6f8">
   <title>SPK Generator</title>
-  <link rel="stylesheet" href="styles.css?v=20261111-delivery-name-under-line">
+  <link rel="stylesheet" href="styles.css?v=20261116-design-notes-sleeve-guide">
 </head>
 <body>
   <header class="app-header">
@@ -128,8 +128,23 @@
         </header>
 
         <section class="document-section design-section">
-          <div class="section-title"><span>01</span><h3>Preview design</h3></div>
-          <div class="design-preview"><div class="design-slot"><img id="designPreview" alt="Preview gambar desain"><span class="slot-label">Gambar desain belum diunggah</span></div></div>
+          <div class="section-title"><span>01</span><h3>Preview desain &amp; model lengan</h3></div>
+          <div class="design-preview">
+            <div class="design-slot">
+              <img id="designPreview" alt="Preview gambar desain">
+              <span class="slot-label">Gambar desain belum diunggah</span>
+            </div>
+            <aside class="garment-guide-panel" aria-label="Ilustrasi model pakaian berdasarkan kategori ukuran">
+              <strong class="garment-guide-title">MODEL LENGAN OTOMATIS</strong>
+              <div id="designGarmentGuides" class="garment-guide-grid">
+                <p class="garment-guide-empty">Isi jumlah size untuk menampilkan model lengan.</p>
+              </div>
+            </aside>
+            <div id="designNotesCaption" class="design-notes-caption" hidden>
+              <strong>CATATAN / KETERANGAN DESAIN</strong>
+              <div id="pNotes" class="notes-content"></div>
+            </div>
+          </div>
         </section>
 
         <section class="document-section">
@@ -149,10 +164,8 @@
           </div>
         </section>
 
-        <section class="document-section notes-box"><div class="section-title"><span>03</span><h3>Catatan produksi</h3></div><div id="pNotes" class="notes-content"></div></section>
-
         <section class="document-section approval-section">
-          <div class="section-title"><span>04</span><h3>Approval</h3></div>
+          <div class="section-title"><span>03</span><h3>Approval</h3></div>
           <div class="approval-table">
             <div class="approval-head">Designer</div><div class="approval-head">CS</div><div class="approval-head">Customer</div><div class="approval-head production-head">Production</div>
             <div id="pApDesigner"></div><div id="pApCs"></div><div id="pApCustomer"></div><div></div><div></div><div></div><div id="pApProduction"></div>
