@@ -252,59 +252,6 @@ function readSize(category, size) {
   return Number.isSafeInteger(value) && value >= 0 ? value : 0;
 }
 
-function garmentIllustrationSvg(sleeve, view, isChild) {
-  const outlines = {
-    pendek: "M41 18 L25 22 L7 34 L18 54 L32 48 L33 111 Q60 121 87 111 L88 48 L102 54 L113 34 L95 22 L79 18 Q60 30 41 18 Z",
-    tigaPerempat: "M41 18 L25 22 L6 33 L3 70 L16 76 L32 48 L33 111 Q60 121 87 111 L88 48 L104 76 L117 70 L114 33 L95 22 L79 18 Q60 30 41 18 Z",
-    panjang: "M41 18 L25 22 L5 33 L1 84 L14 90 L32 48 L33 111 Q60 121 87 111 L88 48 L106 90 L119 84 L115 33 L95 22 L79 18 Q60 30 41 18 Z"
-  };
-  const sleevePath = outlines[sleeve] || outlines.pendek;
-  const neckline = view === "back" ? "M45 18 Q60 25 75 18" : "M45 18 Q60 33 75 18";
-  const cuff = sleeve === "panjang"
-    ? '<path d="M1 84 L14 90 M106 90 L119 84" class="garment-cuff"/>'
-    : sleeve === "tigaPerempat"
-      ? '<path d="M3 70 L16 76 M104 76 L117 70" class="garment-cuff"/>'
-      : "";
-  const scale = isChild ? ' transform="translate(9 7) scale(.85)"' : "";
-  return `<svg viewBox="0 0 120 132" aria-label="Tampak ${view === "front" ? "depan" : "belakang"}">
-    <g${scale}>
-      <path d="${sleevePath}" class="garment-outline"/>
-      <path d="${neckline}" class="garment-neck"/>
-      <path d="M34 111 Q60 118 86 111" class="garment-detail"/>
-      ${view === "back" ? '<path d="M60 25 L60 113" class="garment-detail"/>' : '<path d="M60 34 L60 108" class="garment-detail garment-detail-faint"/>'}
-      ${cuff}
-    </g>
-  </svg>`;
-}
-
-function renderGarmentGuides() {
-  const target = $("#designGarmentGuides");
-  if (!target) return;
-  const activeCategories = categories.filter(category =>
-    sizes.some(size => readSize(category.id, size) > 0)
-  );
-  if (!activeCategories.length) {
-    target.innerHTML = '<p class="garment-guide-empty">Isi jumlah size untuk menampilkan model lengan.</p>';
-    return;
-  }
-  target.innerHTML = activeCategories.map(category => {
-    const sleeve = category.id.endsWith("-panjang")
-      ? "panjang"
-      : category.id.endsWith("-3-4") ? "tigaPerempat" : "pendek";
-    const sleeveLabel = sleeve === "panjang" ? "LENGAN PANJANG"
-      : sleeve === "tigaPerempat" ? "LENGAN 3/4" : "LENGAN PENDEK";
-    const isChild = category.id.startsWith("anak-");
-    return `<article class="garment-guide-card">
-      <strong>${category.label}</strong>
-      <div class="garment-guide-views">
-        <div class="garment-guide-view">${garmentIllustrationSvg(sleeve, "front", isChild)}<small>DEPAN</small></div>
-        <div class="garment-guide-view">${garmentIllustrationSvg(sleeve, "back", isChild)}<small>BELAKANG</small></div>
-      </div>
-      <span class="garment-guide-sleeve">${sleeveLabel}</span>
-    </article>`;
-  }).join("");
-}
-
 function renderDesignNotes() {
   const notes = $("#notes").value.trim();
   $("#pNotes").textContent = notes;
@@ -327,7 +274,7 @@ function updateSizes() {
   $("#sizeTotal").textContent = total;
   $("#quantity").value = total;
   $("#pQuantity").textContent = total;
-  renderGarmentGuides();
+
 }
 
 function validateForm() {
