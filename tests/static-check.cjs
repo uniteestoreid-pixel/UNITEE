@@ -64,19 +64,21 @@ assert.match(css, /\.spk \.design-preview\s*\{[^}]*flex:\s*0 0 auto; min-height:
   'Print design preview must expand to include the model guide and optional notes');
 assert.match(css, /\.spk \.size-list, \.spk \.size-list-heading\s*\{[^}]*font-weight:\s*700/s, 'Print size details should be bold');
 assert.match(css, /\.spk \.size-list-items\s*\{[^}]*font-weight:\s*700/s, 'Print size quantities should be bold');
-assert.ok(html.includes('id="designGarmentGuides"'), 'SPK preview must include automatic sleeve illustrations');
-assert.ok(html.includes('id="designNotesCaption"') && html.includes('id="pNotes"'), 'SPK notes must be placed inside the design preview image area');
-assert.ok(script.includes('function renderGarmentGuides()'), 'SPK must render garment guides from active size categories');
-assert.ok(script.includes('category.id.endsWith("-panjang")') && script.includes('"panjang"'), 'Long-sleeve categories must generate long-sleeve illustrations');
-assert.ok(script.includes('category.id.endsWith("-3-4")'), 'Three-quarter sleeve categories must be represented');
+assert.ok(!html.includes('designGarmentGuides') && !html.includes('garment-guide-panel'),
+  'Automatic garment illustration panel must be removed from the SPK document');
+assert.ok(html.includes('id="designNotesCaption"') && html.includes('id="pNotes"'),
+  'SPK notes must remain below the full-width design image');
+assert.ok(!script.includes('function garmentIllustrationSvg(') && !script.includes('function renderGarmentGuides()') && !script.includes('renderGarmentGuides();'),
+  'Automatic sleeve illustration generation must be removed from SPK script');
 assert.ok(script.includes('function renderDesignNotes()'), 'SPK design notes must update with the note input');
-assert.match(css, /@media print\s*\{[\s\S]*?\.design-preview\s*\{\s*display:\s*grid !important;[\s\S]*?grid-template-columns:\s*minmax\(0, 1\.15fr\) minmax\(48mm, \.85fr\) !important;/,
-  'Printed SPK must reserve a dedicated area for the garment illustration');
-assert.match(css, /\.garment-guide-panel\s*\{\s*display:\s*block !important; grid-column:\s*2 !important;/,
-  'Garment sleeve illustrations must remain visible in print');
-assert.match(css, /\.design-notes-caption:not\(\[hidden\]\)\s*\{\s*display:\s*block !important; grid-column:\s*1 \/ -1 !important;/,
-  'Production notes must print directly below the design and sleeve illustration');
-assert.match(css, /\.garment-guide-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,/s, 'Automatic garment illustrations must fit in the preview');
+assert.match(css, /\.design-preview\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/s,
+  'Design preview must use full available width');
+assert.match(css, /@media print\s*\{[\s\S]*?\.design-preview\s*\{\s*display: grid !important; grid-template-columns: minmax\(0, 1fr\) !important;/,
+  'Printed SPK design image must expand across the full page width');
+assert.match(css, /\.design-notes-caption:not\(\[hidden\]\)\s*\{\s*display: block !important; grid-column:\s*1 !important;/,
+  'Production notes must print directly below the full-width design image');
+assert.doesNotMatch(css, /garment-guide-(?:panel|title|grid|card|view)/,
+  'Garment guide styling must be fully removed');
 assert.match(css, /\.design-notes-caption\[hidden\]\s*\{\s*display:\s*none/s, 'Empty notes captions must not take space');
 assert.match(css, /@media print\s*\{[\s\S]*?\.design-section > \.section-title\s*\{\s*display:\s*none !important;/,
   'The design section heading must be omitted from the printed page');
