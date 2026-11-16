@@ -265,7 +265,14 @@ function updateSizes() {
     const items = sizes.map(size => ({ size, qty: readSize(category.id, size) })).filter(item => item.qty > 0);
     items.forEach(item => { total += item.qty; });
     if (items.length) {
-      groups.push(`<div class="size-list-group"><div class="size-list-heading">${category.label}</div><div class="size-list-items">${items.map(item => `<span class="size-list-item">${item.size} : ${item.qty} pcs</span>`).join("")}</div></div>`);
+      const sleeve = category.id.endsWith("-panjang")
+        ? "LENGAN PJG"
+        : category.id.endsWith("-3-4") ? "LENGAN 3/4" : "LENGAN PENDEK";
+      const audience = category.id.startsWith("anak-") ? " (ANAK)" : "";
+      const sleeveClass = category.id.endsWith("-panjang")
+        ? "size-list-group--long"
+        : category.id.endsWith("-3-4") ? "size-list-group--three-quarter" : "size-list-group--short";
+      groups.push(`<div class="size-list-group ${sleeveClass}"><div class="size-list-heading">${sleeve}${audience}</div><div class="size-list-items">${items.map(item => `<span class="size-list-item">${item.size} : ${item.qty} pcs</span>`).join("")}</div></div>`);
     }
   });
   $("#previewSizeBreakdown").innerHTML = groups.length
