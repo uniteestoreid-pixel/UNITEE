@@ -265,10 +265,10 @@ textarea { min-height: 82px; resize: vertical; }
   .design-notes-caption > strong { font-size: 6.5pt; }
   .design-notes-caption .notes-content { font-size: 8pt; line-height: 1.2; }
   #spk img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  /* Detail order follows the reference layout: order information on the left, size breakdown on the right. */
+  /* Detail order: black title bar, order fields on the left, sleeve quantities on the right. */
   .design-section + .document-section > .section-title {
     display: flex !important; justify-content: center; align-items: center;
-    margin-bottom: 2mm; padding: 1.5mm 2mm; border: 0;
+    margin-bottom: 2mm; padding: 1.6mm 2mm; border: 0;
     background: #111; color: #fff; text-align: center;
   }
   .design-section + .document-section > .section-title > span { display: none; }
@@ -276,23 +276,41 @@ textarea { min-height: 82px; resize: vertical; }
     margin: 0; color: #fff; font-size: 10pt; font-weight: 800; letter-spacing: .04em;
   }
   .detail-layout {
-    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
-    align-items: start; gap: 4mm; width: 100%;
+    display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+    align-items: start; gap: 5mm; width: 100%;
   }
   .info { width: 100%; grid-template-columns: minmax(0, 1fr); column-gap: 0; row-gap: 0; }
   .info > div {
-    display: grid; grid-template-columns: 23mm minmax(0, 1fr);
-    align-items: start; gap: 2mm; padding: 1.4mm 0;
-    text-align: left; font-size: 9pt; border-bottom: 1px solid #d9dee4;
+    display: grid; grid-template-columns: 24mm minmax(0, 1fr);
+    align-items: start; gap: 1.5mm; padding: 1.1mm 0;
+    text-align: left; font-size: 8.5pt; line-height: 1.2;
+    border-bottom: 0;
   }
   .info dt { font-weight: 700; }
+  .info dt::after { content: ":"; float: right; margin-right: 1mm; }
   .info dd { font-weight: 800; }
   .size-list {
     display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-    width: 100%; gap: 2mm; font-size: 9pt; line-height: 1.25;
+    width: 100%; gap: 2mm 3mm; font-size: 8.5pt; line-height: 1.25;
     text-align: left; align-items: start;
   }
-  .size-list-heading { font-size: 9.5pt; }
+  .size-list-heading {
+    margin: 0 0 1mm; font-size: 8.5pt; font-weight: 800;
+    line-height: 1.15; text-transform: uppercase; color: #111;
+  }
+  .spk .size-list-group {
+    min-width: 0; margin: 0; padding: 0;
+    border: 0; border-radius: 0; background: transparent;
+    text-align: left; break-inside: avoid; page-break-inside: avoid;
+  }
+  .spk .size-list-items {
+    display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: baseline;
+    gap: .6mm 2mm; font-weight: 700; text-align: left;
+  }
+  .spk .size-list-group--long .size-list-heading,
+  .spk .size-list-group--long .size-list-item { color: #ef2929; }
+  .spk .size-list-group--three-quarter .size-list-heading,
+  .spk .size-list-group--three-quarter .size-list-item { color: #b45309; }
   /* Catatan desain berada tepat di bawah gambar dan ikut masuk ke JPG/PDF. */
   .notes-content { min-height: 0; font-size: 8pt; line-height: 1.2; }
   .approval-section { margin-top: 2mm; padding-top: 0; break-inside: avoid; page-break-inside: avoid; }
