@@ -84,7 +84,12 @@ assert.match(css, /@media print\s*\{[\s\S]*?\.design-section > \.section-title\s
   'The design section heading must be omitted from the printed page');
 assert.match(css, /\.spk > \.approval-section\s*\{\s*margin-top:\s*auto !important;/,
   'The approval area must be pushed to the bottom of the printed A4 page');
-assert.match(css, /\.detail-layout\s*\{[^}]*flex-direction:\s*column/s, 'Print size breakdown must sit below order details');
+assert.match(css, /\.detail-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 1\.12fr\)/s,
+  'Print detail order must place order details beside the size breakdown');
+assert.match(css, /\.design-section \+ \.document-section > \.section-title\s*\{[^}]*background:\s*#111/s,
+  'Print detail order must use the reference dark title strip');
+assert.match(css, /\.info > div\s*\{[^}]*grid-template-columns:\s*23mm minmax\(0, 1fr\)/s,
+  'Print order fields must use label and value rows');
 assert.match(css, /\.info\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/s, 'Print order details should be arranged horizontally in four columns');
 assert.match(css, /\.info > div\s*\{[^}]*align-items:\s*center; justify-content:\s*center;/s, 'Print order details should be centered');
 assert.match(css, /\.size-list\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s, 'Print size groups should be arranged in two consistent columns below order details');
