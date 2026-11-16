@@ -55,11 +55,13 @@ assert.match(script, /images\.map\(image => waitForImageReady\(image\)\)/, 'Prin
 assert.match(css, /\.spk \.size-list-group\s*\{[^}]*break-inside:\s*avoid/s, 'Print size groups should stay together');
 assert.match(css, /\.spk \.approval-section\s*\{[^}]*page-break-inside:\s*avoid/s, 'Approval section should stay together in print');
 assert.match(css, /\.spk\s*\{[^}]*display:\s*flex/s, 'Print document should use vertical flex layout');
-assert.match(css, /\.spk > \.notes-box\s*\{[^}]*margin-top:\s*auto/s, 'Print notes and approval should sit at the bottom when space allows');
+assert.ok(html.includes('id="designNotesCaption"') && html.includes('id="pNotes"'),
+  'Notes must appear together with the uploaded design and garment guide');
 assert.match(css, /\.approval-table div\s*\{[^}]*min-height:\s*12mm/s, 'Print approval rows should be compact');
 assert.match(css, /\.spk \.size-list, \.spk \.size-list-heading\s*\{[^}]*font-size:\s*10pt/, 'Print size list should use larger typography');
 assert.match(css, /@page \{ size: A4 portrait; margin: 7mm; \}/, 'Print page must stay A4 portrait');
-assert.match(css, /\.spk \.design-preview\s*\{\s*flex:\s*0 0 82mm; min-height:\s*82mm; max-height:\s*82mm;/, 'Print design preview should be enlarged and fixed');
+assert.match(css, /\.spk \.design-preview\s*\{[^}]*flex:\s*0 0 auto; min-height:\s*62mm; max-height:\s*none;/s,
+  'Print design preview must expand to include the model guide and optional notes');
 assert.match(css, /\.spk \.size-list, \.spk \.size-list-heading\s*\{[^}]*font-weight:\s*700/s, 'Print size details should be bold');
 assert.match(css, /\.spk \.size-list-items\s*\{[^}]*font-weight:\s*700/s, 'Print size quantities should be bold');
 assert.ok(html.includes('id="designGarmentGuides"'), 'SPK preview must include automatic sleeve illustrations');
