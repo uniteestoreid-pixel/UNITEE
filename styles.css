@@ -262,6 +262,10 @@ textarea { min-height: 82px; resize: vertical; }
   .document-section { margin-top: 3mm; }
   .section-title { break-after: avoid; }
   .design-section, .design-preview, .detail-layout, .approval-section { break-inside: avoid; page-break-inside: avoid; }
+  /* Hilangkan heading area desain pada kertas; ruangnya dipakai untuk konten dokumen. */
+  .design-section > .section-title { display: none !important; }
+  /* Approval mengikuti ruang tersisa dan menempel di bagian bawah A4. */
+  .spk > .approval-section { margin-top: auto !important; }
   .design-preview {
     display: grid !important;
     grid-template-columns: minmax(0, 1.15fr) minmax(48mm, .85fr) !important;
