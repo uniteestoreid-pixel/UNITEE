@@ -60,8 +60,8 @@ assert.ok(html.includes('id="designNotesCaption"') && html.includes('id="pNotes"
 assert.match(css, /\.approval-table div\s*\{[^}]*min-height:\s*12mm/s, 'Print approval rows should be compact');
 assert.match(css, /\.spk \.size-list, \.spk \.size-list-heading\s*\{[^}]*font-size:\s*10pt/, 'Print size list should use larger typography');
 assert.match(css, /@page \{ size: A4 portrait; margin: 7mm; \}/, 'Print page must stay A4 portrait');
-assert.match(css, /\.spk \.design-preview\s*\{[^}]*flex:\s*0 0 auto; min-height:\s*62mm; max-height:\s*none;/s,
-  'Print design preview must expand to include the model guide and optional notes');
+assert.match(css, /\.spk \.design-preview\s*\{[^}]*flex:\s*0 0 auto; min-height:\s*0; max-height:\s*none;/s,
+  'Print design preview must not force excess vertical space');
 assert.match(css, /\.spk \.size-list, \.spk \.size-list-heading\s*\{[^}]*font-weight:\s*700/s, 'Print size details should be bold');
 assert.match(css, /\.spk \.size-list-items\s*\{[^}]*font-weight:\s*700/s, 'Print size quantities should be bold');
 assert.ok(!html.includes('designGarmentGuides') && !html.includes('garment-guide-panel'),
@@ -94,11 +94,12 @@ assert.match(css, /\.design-section \+ \.document-section > \.section-title\s*\{
   'Print detail order must use the reference dark title strip');
 assert.match(css, /\.info > div\s*\{[^}]*grid-template-columns:\s*23mm minmax\(0, 1fr\)/s,
   'Print order fields must use label and value rows');
-assert.match(css, /\.info\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/s, 'Print order details should stack as readable label-value rows in the left column');
-assert.match(css, /\.info > div\s*\{[^}]*grid-template-columns:\s*23mm minmax\(0, 1fr\)/s, 'Print order labels and values should stay aligned');
-assert.match(css, /\.size-list\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s, 'Print size groups should be arranged in two consistent columns below order details');
-assert.match(css, /\.spk \.size-list-group\s*\{[^}]*border:\s*\.5pt solid/s, 'Print size groups should have consistent card boundaries');
-assert.match(css, /\.spk \.size-list-group\s*\{[^}]*text-align:\s*left/s, 'Print size groups should be left-aligned for readability');
+
+assert.match(css, /\.size-list\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s, 'Print sleeve groups should be arranged in two columns');
+assert.match(script, /LENGAN PJG/, 'Long-sleeve size groups must use the compact long-sleeve label');
+assert.match(script, /LENGAN PENDEK/, 'Short-sleeve size groups must use the compact short-sleeve label');
+assert.match(css, /\.spk \.size-list-group--long \.size-list-heading,[\s\S]*?\.spk \.size-list-group--long \.size-list-item \{ color: #ef2929; \}/,
+  'Long-sleeve headings and quantities must be red in print');
 assert.match(css, /\.spk \.size-list-items\s*\{[^}]*justify-content:\s*flex-start/s, 'Print size values should start at a consistent left edge');
 
 for (const rpc of ['next_spk_number', 'save_spk', 'delete_spk', 'remove_workspace_member', 'create_workspace', 'add_workspace_member']) {
