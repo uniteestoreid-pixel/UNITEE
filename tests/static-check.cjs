@@ -62,6 +62,14 @@ assert.match(css, /@page \{ size: A4 portrait; margin: 7mm; \}/, 'Print page mus
 assert.match(css, /\.spk \.design-preview\s*\{\s*flex:\s*0 0 82mm; min-height:\s*82mm; max-height:\s*82mm;/, 'Print design preview should be enlarged and fixed');
 assert.match(css, /\.spk \.size-list, \.spk \.size-list-heading\s*\{[^}]*font-weight:\s*700/s, 'Print size details should be bold');
 assert.match(css, /\.spk \.size-list-items\s*\{[^}]*font-weight:\s*700/s, 'Print size quantities should be bold');
+assert.ok(html.includes('id="designGarmentGuides"'), 'SPK preview must include automatic sleeve illustrations');
+assert.ok(html.includes('id="designNotesCaption"') && html.includes('id="pNotes"'), 'SPK notes must be placed inside the design preview image area');
+assert.ok(script.includes('function renderGarmentGuides()'), 'SPK must render garment guides from active size categories');
+assert.ok(script.includes('category.id.endsWith("-panjang")') && script.includes('"panjang"'), 'Long-sleeve categories must generate long-sleeve illustrations');
+assert.ok(script.includes('category.id.endsWith("-3-4")'), 'Three-quarter sleeve categories must be represented');
+assert.ok(script.includes('function renderDesignNotes()'), 'SPK design notes must update with the note input');
+assert.match(css, /\.garment-guide-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,/s, 'Automatic garment illustrations must fit in the preview');
+assert.match(css, /\.design-notes-caption\[hidden\]\s*\{\s*display:\s*none/s, 'Empty notes captions must not take space');
 assert.match(css, /\.detail-layout\s*\{[^}]*flex-direction:\s*column/s, 'Print size breakdown must sit below order details');
 assert.match(css, /\.info\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/s, 'Print order details should be arranged horizontally in four columns');
 assert.match(css, /\.info > div\s*\{[^}]*align-items:\s*center; justify-content:\s*center;/s, 'Print order details should be centered');
