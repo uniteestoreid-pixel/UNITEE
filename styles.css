@@ -265,22 +265,34 @@ textarea { min-height: 82px; resize: vertical; }
   .design-notes-caption > strong { font-size: 6.5pt; }
   .design-notes-caption .notes-content { font-size: 8pt; line-height: 1.2; }
   #spk img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  /* Center detail order in horizontal rows; move the size breakdown below it. */
-  .detail-layout { display: flex; flex-direction: column; align-items: stretch; gap: 2mm; width: 100%; }
-  .info { width: 100%; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 3mm; row-gap: 0; }
-  .info > div {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: .7mm; padding: 1.5mm 1mm; text-align: center; font-size: 10pt;
-    border-bottom: 1px solid #d9dee4;
+  /* Detail order follows the reference layout: order information on the left, size breakdown on the right. */
+  .design-section + .document-section > .section-title {
+    display: flex !important; justify-content: center; align-items: center;
+    margin-bottom: 2mm; padding: 1.5mm 2mm; border: 0;
+    background: #111; color: #fff; text-align: center;
   }
-  .info dt { font-weight: 600; }
+  .design-section + .document-section > .section-title > span { display: none; }
+  .design-section + .document-section > .section-title h3 {
+    margin: 0; color: #fff; font-size: 10pt; font-weight: 800; letter-spacing: .04em;
+  }
+  .detail-layout {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+    align-items: start; gap: 4mm; width: 100%;
+  }
+  .info { width: 100%; grid-template-columns: minmax(0, 1fr); column-gap: 0; row-gap: 0; }
+  .info > div {
+    display: grid; grid-template-columns: 23mm minmax(0, 1fr);
+    align-items: start; gap: 2mm; padding: 1.4mm 0;
+    text-align: left; font-size: 9pt; border-bottom: 1px solid #d9dee4;
+  }
+  .info dt { font-weight: 700; }
   .info dd { font-weight: 800; }
   .size-list {
     display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-    width: 100%; gap: 2mm 3mm; font-size: 9.5pt; line-height: 1.25;
-    text-align: left; align-items: stretch;
+    width: 100%; gap: 2mm; font-size: 9pt; line-height: 1.25;
+    text-align: left; align-items: start;
   }
-  .size-list-heading { font-size: 10pt; }
+  .size-list-heading { font-size: 9.5pt; }
   /* Catatan desain berada tepat di bawah gambar dan ikut masuk ke JPG/PDF. */
   .notes-content { min-height: 0; font-size: 8pt; line-height: 1.2; }
   .approval-section { margin-top: 2mm; padding-top: 0; break-inside: avoid; page-break-inside: avoid; }
