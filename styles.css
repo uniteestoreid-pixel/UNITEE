@@ -276,7 +276,7 @@ textarea { min-height: 82px; resize: vertical; }
     margin: 0; color: #fff; font-size: 10pt; font-weight: 800; letter-spacing: .04em;
   }
   .detail-layout {
-    display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+    display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.12fr);
     align-items: start; gap: 5mm; width: 100%;
   }
   .info { width: 100%; grid-template-columns: minmax(0, 1fr); column-gap: 0; row-gap: 0; }
@@ -327,10 +327,10 @@ textarea { min-height: 82px; resize: vertical; }
   .spk .size-list, .spk .size-list-heading { font-size: 10pt; line-height: 1.2; font-weight: 700; color: #111; }
   .spk .notes-content, .spk .approval-table div { font-size: 9pt; line-height: 1.2; }
 
-  /* Compress size groups in print so the approval grid stays on the same A4 page. */
+  /* Compact size breakdown, aligned like the supplied Detail Order reference. */
   .spk .size-list-group {
-    min-width: 0; margin: 0; padding: 1.5mm 2mm;
-    border: .5pt solid #d3d9e0; border-radius: 1mm; background: #fff;
+    min-width: 0; margin: 0; padding: 0;
+    border: 0; border-radius: 0; background: transparent;
     text-align: left; break-inside: avoid; page-break-inside: avoid;
   }
   .spk .size-list-heading {
