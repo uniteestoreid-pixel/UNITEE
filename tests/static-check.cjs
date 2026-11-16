@@ -75,6 +75,10 @@ assert.match(css, /\.design-preview\s*\{[^}]*grid-template-columns:\s*minmax\(0,
   'Design preview must use full available width');
 assert.match(css, /@media print\s*\{[\s\S]*?\.design-preview\s*\{\s*display: grid !important; grid-template-columns: minmax\(0, 1fr\) !important;/,
   'Printed SPK design image must expand across the full page width');
+assert.match(css, /grid-template-rows:\s*56mm auto !important;/,
+  'Printed SPK design image must use a balanced medium-height preview');
+assert.match(css, /min-height:\s*56mm; height:\s*56mm;/,
+  'Printed SPK design image frame must not dominate the A4 page');
 assert.match(css, /\.design-notes-caption:not\(\[hidden\]\)\s*\{\s*display: block !important; grid-column:\s*1 !important;/,
   'Production notes must print directly below the full-width design image');
 assert.doesNotMatch(css, /garment-guide-(?:panel|title|grid|card|view)/,
@@ -90,8 +94,8 @@ assert.match(css, /\.design-section \+ \.document-section > \.section-title\s*\{
   'Print detail order must use the reference dark title strip');
 assert.match(css, /\.info > div\s*\{[^}]*grid-template-columns:\s*23mm minmax\(0, 1fr\)/s,
   'Print order fields must use label and value rows');
-assert.match(css, /\.info\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/s, 'Print order details should be arranged horizontally in four columns');
-assert.match(css, /\.info > div\s*\{[^}]*align-items:\s*center; justify-content:\s*center;/s, 'Print order details should be centered');
+assert.match(css, /\.info\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/s, 'Print order details should stack as readable label-value rows in the left column');
+assert.match(css, /\.info > div\s*\{[^}]*grid-template-columns:\s*23mm minmax\(0, 1fr\)/s, 'Print order labels and values should stay aligned');
 assert.match(css, /\.size-list\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s, 'Print size groups should be arranged in two consistent columns below order details');
 assert.match(css, /\.spk \.size-list-group\s*\{[^}]*border:\s*\.5pt solid/s, 'Print size groups should have consistent card boundaries');
 assert.match(css, /\.spk \.size-list-group\s*\{[^}]*text-align:\s*left/s, 'Print size groups should be left-aligned for readability');
