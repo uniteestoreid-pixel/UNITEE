@@ -93,12 +93,58 @@ textarea { min-height: 82px; resize: vertical; }
 .section-title { display: flex; align-items: center; gap: 9px; margin-bottom: 2.5mm; padding-bottom: 1.8mm; border-bottom: 1px solid #cfd5dc; }
 .section-title > span { color: #647385; font-size: 9pt; font-weight: 700; }
 .section-title h3 { margin: 0; font-size: 11pt; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
-.design-preview { height: 82mm; overflow: hidden; border: 1px solid #d9dee4; background: #fff; }
-.design-slot { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.design-preview {
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+  grid-template-rows: minmax(0, 1fr) auto; gap: 2mm;
+  min-height: 82mm; padding: 2mm; box-sizing: border-box;
+  overflow: visible; border: 1px solid #d9dee4; background: #fff;
+}
+.design-slot {
+  position: relative; grid-column: 1; grid-row: 1; min-width: 0; min-height: 68mm;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; border: 1px solid #e4e8ed; background: #fff;
+}
 .design-slot img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain; }
 .design-slot img:not([src]), .design-slot img[src=""] { display: none; }
 .slot-label { position: absolute; color: #929da8; font-size: 10pt; font-weight: 600; }
 .design-slot img[src]:not([src=""]) ~ .slot-label { display: none; }
+.garment-guide-panel {
+  grid-column: 2; grid-row: 1; min-width: 0; min-height: 0; padding: 2mm;
+  border: 1px solid #e4e8ed; background: #fbfcfd;
+}
+.garment-guide-title {
+  display: block; margin-bottom: 1.5mm; color: #374151;
+  font-size: 8pt; font-weight: 800; letter-spacing: .04em; text-align: center;
+}
+.garment-guide-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5mm; }
+.garment-guide-card {
+  min-width: 0; padding: 1mm; border: 1px solid #e4e8ed; border-radius: 1mm;
+  background: #fff; text-align: center;
+}
+.garment-guide-card > strong {
+  display: block; margin-bottom: .5mm; font-size: 7pt; line-height: 1.15;
+}
+.garment-guide-views { display: flex; align-items: end; justify-content: center; gap: 1mm; }
+.garment-guide-view { display: flex; min-width: 0; flex: 1; flex-direction: column; align-items: center; }
+.garment-guide-view svg { display: block; width: 100%; height: 25mm; max-width: 22mm; }
+.garment-guide-view small { color: #64748b; font-size: 5.5pt; font-weight: 700; }
+.garment-outline { fill: #f8fafc; stroke: #64748b; stroke-width: 2.2; stroke-linejoin: round; }
+.garment-neck { fill: none; stroke: #64748b; stroke-width: 2; stroke-linecap: round; }
+.garment-detail { fill: none; stroke: #cbd5e1; stroke-width: 1.2; }
+.garment-detail-faint { opacity: .5; }
+.garment-cuff { fill: none; stroke: #64748b; stroke-width: 1.8; }
+.garment-guide-sleeve { display: block; color: #475569; font-size: 6pt; font-weight: 800; }
+.garment-guide-empty { grid-column: 1 / -1; margin: 15mm 1mm; color: #94a3b8; font-size: 8pt; line-height: 1.4; text-align: center; }
+.design-notes-caption {
+  grid-column: 1 / -1; grid-row: 2; min-width: 0; padding: 1.5mm 2mm;
+  border-top: 1px solid #cbd5e1; background: #f8fafc;
+}
+.design-notes-caption[hidden] { display: none !important; }
+.design-notes-caption > strong {
+  display: block; margin-bottom: 1mm; color: #475569;
+  font-size: 7.5pt; font-weight: 800; letter-spacing: .04em;
+}
+.design-notes-caption .notes-content { min-height: 0; font-size: 8.5pt; line-height: 1.35; }
 .detail-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, .8fr); gap: 7mm; align-items: start; }
 .info { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 5mm; }
 .info > div { min-width: 0; display: grid; grid-template-columns: minmax(21mm, .9fr) minmax(0, 1.1fr); gap: 1.5mm; padding: 2.2mm 0; border-bottom: 1px solid #e2e6ea; font-size: 10pt; line-height: 1.35; }
@@ -216,12 +262,23 @@ textarea { min-height: 82px; resize: vertical; }
   .document-section { margin-top: 3mm; }
   .section-title { break-after: avoid; }
   .design-section, .design-preview, .detail-layout, .approval-section { break-inside: avoid; page-break-inside: avoid; }
-  .design-preview { height: 82mm; overflow: hidden; }
+  .design-preview {
+    height: auto; min-height: 62mm; max-height: none; overflow: visible;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+  .design-slot { min-height: 54mm; }
   #spk .design-slot #designPreview[src]:not([src=""]) {
     display: block !important; visibility: visible !important; opacity: 1 !important;
     width: 100%; height: 100%; object-fit: contain;
   }
-  .spk .design-preview { flex: 0 0 82mm; min-height: 82mm; max-height: 82mm; }
+  .spk .design-preview { flex: 0 0 auto; min-height: 62mm; max-height: none; }
+  .garment-guide-title { font-size: 7pt; }
+  .garment-guide-card > strong { font-size: 6.5pt; }
+  .garment-guide-view svg { height: 17mm; max-width: 16mm; }
+  .garment-guide-view small, .garment-guide-sleeve { font-size: 5.5pt; }
+  .design-notes-caption { padding: 1mm 1.5mm; }
+  .design-notes-caption > strong { font-size: 6.5pt; }
+  .design-notes-caption .notes-content { font-size: 8pt; line-height: 1.2; }
   #spk img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   /* Center detail order in horizontal rows; move the size breakdown below it. */
   .detail-layout { display: flex; flex-direction: column; align-items: stretch; gap: 2mm; width: 100%; }
@@ -239,9 +296,8 @@ textarea { min-height: 82px; resize: vertical; }
     text-align: left; align-items: stretch;
   }
   .size-list-heading { font-size: 10pt; }
-  /* Pin catatan + approval ke bagian bawah halaman ketika masih ada ruang. */
-  .spk > .notes-box { margin-top: auto !important; break-inside: auto; page-break-inside: auto; padding-top: 0; }
-  .notes-content { min-height: 6mm; font-size: 9pt; line-height: 1.25; }
+  /* Catatan desain berada tepat di bawah gambar dan ikut masuk ke JPG/PDF. */
+  .notes-content { min-height: 0; font-size: 8pt; line-height: 1.2; }
   .approval-section { margin-top: 2mm; padding-top: 0; break-inside: avoid; page-break-inside: avoid; }
   .approval-table div { min-height: 12mm; padding: .7mm .5mm; font-size: 9pt; line-height: 1.15; }
   .approval-table .approval-head { min-height: 6mm; }
