@@ -3816,3 +3816,13 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
     text-align: center !important;
   }
 }
+
+
+/* Slightly enlarge the SPK design preview for print/PDF. */
+@media print {
+  #spk .design-slot {
+    height: 250px !important;
+    min-height: 250px !important;
+    max-height: 250px !important;
+  }
+}
