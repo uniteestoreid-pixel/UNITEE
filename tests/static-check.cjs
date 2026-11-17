@@ -363,3 +363,6 @@ assert.match(approvalFitCss, /#spk \.approval-table div\s*\{[^}]*min-height:\s*3
   'Approval signature area must be compact enough for one A4 page');
 assert.match(approvalFitCss, /#spk \.approval-section\s*\{[^}]*break-inside:\s*avoid !important/s,
   'Approval table must stay together when it fits on the page');
+
+assert.match(approvalFitCss, /#spk \.document-section,\s*#spk \.detail-section,\s*#spk \.approval-section\s*\{[^}]*margin-top:\s*8px !important/s,
+  'SPK print sections must use compact spacing to keep approval on the first A4 page');
