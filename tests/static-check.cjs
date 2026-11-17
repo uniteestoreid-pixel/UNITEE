@@ -55,10 +55,17 @@ assert.match(script, /images\.map\(image => waitForImageReady\(image\)\)/, 'Prin
 assert.match(css, /\.spk \.size-list-group\s*\{[^}]*break-inside:\s*avoid/s, 'Print size groups should stay together');
 assert.match(css, /\.spk \.approval-section\s*\{[^}]*page-break-inside:\s*avoid/s, 'Approval section should stay together in print');
 
-assert.match(css, /#spk \.size-list\s*\{[^}]*display:\s*grid !important;[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s,
+assert.match(css, /#spk \.detail-size-panel \.size-list\s*\{[^}]*display:\s*grid !important;[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s,
   'Print size groups must use a compact two-column layout');
-assert.match(css, /#spk #previewSizeBreakdown::before\s*\{[^}]*grid-column:\s*1 \/ -1/s,
-  'The size breakdown title must span both print columns');
+assert.ok(html.includes('class="detail-panel detail-order-panel"') &&
+  html.includes('class="detail-panel detail-size-panel"'),
+  'Detail Order and Rincian Ukuran must be rendered as two separate columns');
+assert.ok(html.includes('<h3>Detail Order</h3>') && html.includes('<h3>Rincian Ukuran</h3>'),
+  'Both order columns must have their own title tabs');
+assert.match(css, /#spk \.detail-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, \.9fr\) minmax\(0, 1\.1fr\)/s,
+  'Print order and size panels must sit side by side');
+assert.match(css, /#spk \.detail-size-panel \.size-list\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s,
+  'Size-category tables must also use two columns');
 assert.match(css, /#spk \.size-list-total\s*\{[^}]*grid-column:\s*1 \/ -1/s,
   'The size total must span both print columns');
 assert.match(css, /#spk\.spk\s*\{[^}]*height:\s*auto !important;[^}]*min-height:\s*287mm !important;/s,
