@@ -266,7 +266,7 @@ function updateSizes() {
     items.forEach(item => { total += item.qty; });
     if (items.length) {
       const sleeve = category.id.endsWith("-panjang")
-        ? "LENGAN PJG"
+        ? "PANJANG"
         : category.id.endsWith("-3-4") ? "LENGAN 3/4" : "LENGAN PENDEK";
       const audience = category.id.startsWith("anak-") ? " (ANAK)" : "";
       const sleeveClass = category.id.endsWith("-panjang")
