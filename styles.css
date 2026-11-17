@@ -3836,3 +3836,83 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
     max-height: 370px !important;
   }
 }
+
+
+/* Keep the enlarged 370px preview while fitting the approval block onto the first A4 page. */
+@media print {
+  #spk.spk {
+    height: auto !important;
+    min-height: 297mm !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Reduce only vertical gaps between major sections. */
+  #spk .document-section,
+  #spk .detail-section,
+  #spk .approval-section {
+    margin-top: 8px !important;
+  }
+
+  /* Compact the order panel rows so the detail block no longer pushes approval to page two. */
+  #spk .detail-panel {
+    padding: 34px 12px 12px !important;
+    overflow: visible !important;
+  }
+  #spk .detail-order-panel .info > div {
+    min-height: 26px !important;
+    height: auto !important;
+    margin: 4px 0 !important;
+    gap: 7px !important;
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+  }
+  #spk .detail-order-panel .info dt {
+    flex: 0 0 105px !important;
+    width: 105px !important;
+    min-width: 105px !important;
+    height: 26px !important;
+    min-height: 26px !important;
+    padding: 0 8px !important;
+    font-size: 12px !important;
+  }
+  #spk .detail-order-panel .info dd {
+    min-height: 26px !important;
+    height: auto !important;
+    padding: 2px 0 !important;
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+  }
+
+  /* Keep the approval heading and signature grid compact and unbroken. */
+  #spk .approval-section {
+    margin: 8px 0 0 !important;
+    padding: 6px !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #spk .approval-section > .section-title {
+    height: 26px !important;
+    min-height: 26px !important;
+    margin: -6px 0 1px -6px !important;
+  }
+  #spk .approval-section > .section-title > span,
+  #spk .approval-section > .section-title h3 {
+    height: 26px !important;
+    min-height: 26px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    font-size: 12px !important;
+    line-height: 26px !important;
+  }
+  #spk .approval-table .approval-head {
+    height: 26px !important;
+    min-height: 26px !important;
+    font-size: 11px !important;
+    line-height: 26px !important;
+  }
+  #spk .approval-table div {
+    min-height: 34px !important;
+    font-size: 11px !important;
+  }
+}
