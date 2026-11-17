@@ -3026,3 +3026,208 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
     font-weight: 850 !important;
   }
 }
+
+
+/* True full-sheet A4: use the entire paper with a clean internal 7mm safe area. */
+@page { size: A4 portrait; margin: 0; }
+@media print {
+  html, body {
+    width: 210mm !important;
+    height: 297mm !important;
+    min-width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    overflow: visible !important;
+  }
+  body:not(.accessory-mode):not(.delivery-mode) .app {
+    display: block !important;
+    box-sizing: border-box !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  body:not(.accessory-mode):not(.delivery-mode) .preview-wrap {
+    display: block !important;
+    box-sizing: border-box !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  #spk.spk {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+    width: 196mm !important;
+    max-width: 196mm !important;
+    height: 283mm !important;
+    min-height: 283mm !important;
+    max-height: 283mm !important;
+    margin: 7mm auto !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+
+  /* Keep the header readable while using the wider full-sheet content area. */
+  #spk .document-header {
+    flex: 0 0 25mm !important;
+    height: 25mm !important;
+    min-height: 25mm !important;
+    padding-bottom: 2.5mm !important;
+  }
+
+  /* Large design preview and note strip. */
+  #spk .design-section {
+    flex: 0 0 auto !important;
+    margin-top: 0 !important;
+  }
+  #spk .design-section > .section-title {
+    height: 7mm !important;
+    margin: 0 0 -3.2mm !important;
+  }
+  #spk .design-section > .section-title h3 {
+    min-height: 7mm !important;
+    padding: 1.3mm 8mm 1.3mm 3.5mm !important;
+    font-size: 9.5pt !important;
+  }
+  #spk .design-preview {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 63mm auto !important;
+    gap: 1.5mm !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 5mm 2.5mm 2.5mm !important;
+    border: 1px solid #1a456e !important;
+    border-radius: 2mm !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  #spk .design-slot {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    height: 63mm !important;
+    min-height: 63mm !important;
+    overflow: hidden !important;
+    background: #303030 !important;
+  }
+  #spk .design-notes-caption:not([hidden]) {
+    display: grid !important;
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    grid-template-columns: 46mm minmax(0, 1fr) !important;
+    align-items: center !important;
+    min-height: 10mm !important;
+    padding: 1.5mm 3mm !important;
+  }
+
+  /* Fixed reference-like height makes the whole document use the A4 sheet. */
+  #spk .detail-section {
+    display: block !important;
+    flex: 0 0 126mm !important;
+    width: 100% !important;
+    height: 126mm !important;
+    min-height: 126mm !important;
+    max-height: 126mm !important;
+    margin-top: 0 !important;
+    overflow: visible !important;
+  }
+  #spk .detail-section .detail-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    gap: 4mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+  #spk .detail-panel {
+    display: block !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 8mm 3mm 3mm !important;
+    border: 1px solid #1a456e !important;
+    border-radius: 2mm !important;
+    background: #fff !important;
+    overflow: hidden !important;
+  }
+
+  /* Use the full width for the order labels and values. */
+  #spk .detail-order-panel .info > div {
+    grid-template-columns: minmax(27mm, .85fr) minmax(0, 1.15fr) !important;
+    min-height: 7mm !important;
+    font-size: 8pt !important;
+  }
+
+  /* Keep the two-column size card grid top-aligned and in reading order. */
+  #spk .detail-size-panel .size-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-content: start !important;
+    align-items: start !important;
+    grid-auto-rows: min-content !important;
+    gap: 2mm 2.5mm !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #spk .detail-size-panel .size-list-heading {
+    min-height: 5mm !important;
+    padding: .8mm 1mm !important;
+    font-size: 7.2pt !important;
+  }
+  #spk .detail-size-panel .size-list-item {
+    grid-template-columns: 8mm minmax(0, 1fr) !important;
+    min-height: 4.6mm !important;
+    padding: .55mm .8mm !important;
+    font-size: 7.2pt !important;
+  }
+  #spk .detail-size-panel .size-label,
+  #spk .detail-size-panel .size-qty {
+    font-size: 7.2pt !important;
+  }
+
+  /* Approval sits along the lower edge of the full A4 layout. */
+  #spk .approval-section {
+    display: block !important;
+    flex: 0 0 auto !important;
+    margin: 0 0 0 !important;
+    padding: 2.5mm !important;
+    border: 1px solid #1a456e !important;
+    border-radius: 2mm !important;
+    background: #fff !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #spk .approval-section > .section-title {
+    height: 7mm !important;
+    margin: -5mm 0 2mm !important;
+  }
+  #spk .approval-table div { min-height: 16mm !important; }
+}
