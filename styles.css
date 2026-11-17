@@ -1473,3 +1473,250 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
   .spk .section-title h3 { font-size: 10pt; }
   .spk .document-heading h2 { font-size: 18pt; }
 }
+
+/* Final A4 print calibration: prioritize the supplied full-page SPK reference. */
+@page { size: A4 portrait; margin: 5mm; }
+@media print {
+  html, body { width: 210mm !important; min-width: 0 !important; margin: 0 !important; background: #fff !important; overflow: visible !important; }
+  body { font-family: Arial, Helvetica, sans-serif !important; }
+  body:not(.accessory-mode):not(.delivery-mode) .app {
+    display: block !important; width: 200mm !important; max-width: 200mm !important;
+    margin: 0 auto !important; padding: 0 !important;
+  }
+  body:not(.accessory-mode):not(.delivery-mode) .preview-wrap {
+    display: block !important; width: 200mm !important; max-width: 200mm !important;
+    margin: 0 !important; padding: 0 !important; overflow: visible !important;
+  }
+  #spk.spk {
+    display: flex !important; flex-direction: column !important; box-sizing: border-box !important;
+    width: 200mm !important; max-width: 200mm !important; min-height: 287mm !important;
+    height: 287mm !important; margin: 0 !important; padding: 0 !important;
+    overflow: visible !important; border: 0 !important; border-radius: 0 !important;
+    box-shadow: none !important; background: #fff !important; color: #172b40 !important;
+    -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+  }
+  #spk.spk *, #spk.spk *::before, #spk.spk *::after {
+    -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+  }
+
+  /* Header: compact vertical height, stronger company mark and SPK number ribbon. */
+  #spk .document-header {
+    box-sizing: border-box !important; display: flex !important; flex: 0 0 22mm !important;
+    width: 100% !important; height: 22mm !important; align-items: center !important;
+    justify-content: space-between !important; gap: 7mm !important; margin: 0 !important;
+    padding: 0 0 3mm !important; border-bottom: 2px solid #102f50 !important;
+  }
+  #spk .logo-placeholder {
+    display: flex !important; flex: 0 0 50mm !important; width: 50mm !important;
+    height: 17mm !important; max-height: 17mm !important; align-items: center !important;
+    justify-content: flex-start !important; overflow: hidden !important; border: 0 !important;
+  }
+  #spk .logo-placeholder img {
+    display: block !important; width: 100% !important; height: 100% !important;
+    max-width: 100% !important; max-height: 100% !important; object-fit: contain !important;
+    object-position: left center !important;
+  }
+  #spk .document-heading { flex: 1 1 auto !important; min-width: 0 !important; text-align: right !important; }
+  #spk .document-kicker {
+    margin: 0 0 1mm !important; color: #17466f !important; font-size: 9pt !important;
+    font-weight: 800 !important; letter-spacing: .11em !important;
+  }
+  #spk .document-heading h2 {
+    margin: 0 !important; color: #111d2a !important; font-size: 19pt !important;
+    line-height: 1.1 !important; letter-spacing: .005em !important;
+  }
+  #spk .document-meta {
+    display: grid !important; justify-items: end !important; gap: 1.2mm !important;
+    margin-top: 1.8mm !important; color: #38536d !important; font-size: 8.5pt !important; line-height: 1.2 !important;
+  }
+  #spk .document-meta span:first-child {
+    display: inline-block !important; padding: 1.5mm 3mm !important;
+    border: 1px solid #0c5c96 !important; border-radius: 1mm !important;
+    background: #0c5c96 !important; color: #fff !important; font-size: 9pt !important; font-weight: 800 !important;
+  }
+  #spk .document-meta span:last-child { font-size: 8.5pt !important; }
+
+  /* Preview panel: the tab overlaps the upper border and the artwork is enlarged. */
+  #spk .document-section { flex: 0 0 auto !important; margin-top: 5mm !important; }
+  #spk .design-section > .section-title {
+    position: relative !important; z-index: 3 !important; display: flex !important;
+    align-items: center !important; height: 8mm !important; margin: 0 0 -3.5mm !important;
+    padding: 0 !important; border: 0 !important; background: transparent !important;
+  }
+  #spk .design-section > .section-title > span { display: none !important; }
+  #spk .design-section > .section-title h3 {
+    display: inline-flex !important; align-items: center !important; min-height: 8mm !important;
+    margin: 0 !important; padding: 1.8mm 9mm 1.8mm 4mm !important;
+    border: 1px solid #0e4978 !important; border-radius: 1.5mm 0 0 1.5mm !important;
+    background: #0e4978 !important; color: #fff !important; font-size: 11pt !important;
+    font-weight: 850 !important; line-height: 1.1 !important; letter-spacing: .025em !important;
+  }
+  #spk .design-preview {
+    display: grid !important; grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 74mm auto !important; gap: 2mm !important; box-sizing: border-box !important;
+    width: 100% !important; min-height: 0 !important; height: auto !important; max-height: none !important;
+    margin: 0 !important; padding: 6mm 2.5mm 2.5mm !important; overflow: visible !important;
+    border: 1px solid #1a456e !important; border-radius: 2mm !important; background: #fff !important;
+  }
+  #spk .design-slot {
+    display: flex !important; grid-column: 1 !important; grid-row: 1 !important; width: 100% !important;
+    min-width: 0 !important; min-height: 74mm !important; height: 74mm !important;
+    align-items: center !important; justify-content: center !important; overflow: hidden !important;
+    border: 0 !important; border-radius: 1mm !important; background: #303030 !important;
+  }
+  #spk .design-slot #designPreview[src]:not([src=""]) {
+    display: block !important; visibility: visible !important; width: 100% !important; height: 100% !important;
+    max-width: 100% !important; max-height: 100% !important; object-fit: contain !important;
+  }
+  #spk .design-notes-caption:not([hidden]) {
+    display: grid !important; grid-column: 1 !important; grid-row: 2 !important;
+    grid-template-columns: 49mm minmax(0, 1fr) !important; align-items: center !important;
+    min-height: 12mm !important; width: 100% !important; box-sizing: border-box !important;
+    gap: 0 !important; padding: 2mm 3.5mm !important; border: 0 !important;
+    border-radius: 1.5mm !important; background: #e9edf2 !important;
+    break-inside: avoid !important; page-break-inside: avoid !important;
+  }
+  #spk .design-notes-caption > strong {
+    margin: 0 !important; padding-right: 3mm !important; border-right: 1px solid #31516f !important;
+    color: #153b60 !important; font-size: 8pt !important; font-weight: 850 !important; line-height: 1.2 !important;
+  }
+  #spk .design-notes-caption .notes-content {
+    min-height: 0 !important; padding-left: 4mm !important; color: #263b50 !important;
+    font-size: 9.5pt !important; line-height: 1.3 !important;
+  }
+
+  /* Detail order: blue title tab and a balanced, readable two-column card. */
+  #spk .design-section + .document-section > .section-title {
+    position: relative !important; z-index: 3 !important; display: flex !important;
+    align-items: center !important; height: 8mm !important; margin: 0 0 -3.5mm !important;
+    padding: 0 !important; border: 0 !important; background: transparent !important;
+  }
+  #spk .design-section + .document-section > .section-title > span { display: none !important; }
+  #spk .design-section + .document-section > .section-title h3 {
+    display: inline-flex !important; align-items: center !important; min-height: 8mm !important;
+    margin: 0 !important; padding: 1.8mm 9mm 1.8mm 4mm !important;
+    border: 1px solid #0e4978 !important; border-radius: 1.5mm 0 0 1.5mm !important;
+    background: #0e4978 !important; color: #fff !important; font-size: 11pt !important;
+    font-weight: 850 !important; line-height: 1.1 !important;
+  }
+  #spk .detail-layout {
+    display: grid !important; grid-template-columns: minmax(0, 1.02fr) minmax(0, .98fr) !important;
+    align-items: stretch !important; gap: 5mm !important; box-sizing: border-box !important;
+    width: 100% !important; min-height: 84mm !important; height: auto !important;
+    margin: 0 !important; padding: 6mm 5mm 5mm !important;
+    border: 1px solid #1a456e !important; border-radius: 2mm !important; background: #fff !important;
+  }
+  #spk .info {
+    display: grid !important; grid-template-columns: minmax(0, 1fr) !important;
+    align-content: start !important; row-gap: .8mm !important; min-width: 0 !important;
+    margin: 0 !important; padding: 0 5mm 0 0 !important;
+    border: 0 !important; border-right: 1px solid #cbd8e4 !important;
+  }
+  #spk .info > div {
+    display: grid !important; grid-template-columns: 31mm minmax(0, 1fr) !important;
+    align-items: center !important; min-width: 0 !important; min-height: 7.2mm !important;
+    gap: 2mm !important; padding: .45mm 0 !important; border: 0 !important;
+    font-size: 10pt !important; line-height: 1.2 !important;
+  }
+  #spk .info dt {
+    padding: 1.35mm 1.8mm !important; border: 1px solid #b9d2e5 !important;
+    border-radius: 1mm !important; background: #e3eff7 !important;
+    color: #183e60 !important; font-weight: 750 !important;
+  }
+  #spk .info dt::after { content: ":" !important; float: right !important; margin-left: 1mm !important; }
+  #spk .info dd {
+    min-width: 0 !important; margin: 0 !important; color: #172b40 !important;
+    font-weight: 850 !important; overflow-wrap: anywhere !important;
+  }
+  #spk .size-list {
+    display: block !important; width: 100% !important; min-width: 0 !important;
+    margin: 0 !important; padding: 0 !important; color: #172b40 !important;
+    font-size: 9.5pt !important; line-height: 1.2 !important;
+  }
+  #spk #previewSizeBreakdown::before {
+    content: "RINCIAN UKURAN" !important; display: inline-block !important; margin: 0 0 2mm !important;
+    padding: 1.8mm 4mm !important; border: 1px solid #0e4978 !important; border-radius: 1.5mm !important;
+    background: #0e4978 !important; color: #fff !important; font-size: 10pt !important;
+    font-weight: 850 !important; line-height: 1.1 !important; letter-spacing: .02em !important;
+  }
+  #spk .size-list-group {
+    min-width: 0 !important; margin: 0 0 2.5mm !important; padding: 0 !important;
+    border: 0 !important; border-radius: 0 !important; background: transparent !important;
+    text-align: left !important; break-inside: avoid !important; page-break-inside: avoid !important;
+  }
+  #spk .size-list-heading {
+    margin: 0 !important; padding: 1.35mm 2mm !important; border: 1px solid #b9d2e5 !important;
+    border-bottom: 0 !important; border-radius: 1mm 1mm 0 0 !important;
+    background: #edf4f9 !important; color: #183e60 !important; font-size: 8.5pt !important;
+    font-weight: 850 !important; line-height: 1.15 !important;
+  }
+  #spk .size-list-items { display: block !important; width: 100% !important; }
+  #spk .size-list-column-head,
+  #spk .size-list-item {
+    display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    align-items: center !important; gap: 2mm !important; box-sizing: border-box !important;
+    min-height: 7mm !important; padding: 1.5mm 2mm !important;
+    border: 1px solid #cbdce9 !important; border-top: 0 !important;
+    color: #172b40 !important; font-size: 9.5pt !important; line-height: 1.15 !important;
+  }
+  #spk .size-list-column-head {
+    background: #d9eaf5 !important; color: #123b5d !important;
+    font-weight: 850 !important; text-align: center !important;
+  }
+  #spk .size-list-item { background: #fff !important; white-space: normal !important; }
+  #spk .size-label, #spk .size-qty {
+    display: block !important; color: #172b40 !important; font-weight: 800 !important; text-align: center !important;
+  }
+  #spk .size-list-total {
+    display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    align-items: center !important; min-height: 7.5mm !important; gap: 2mm !important;
+    margin-top: 1.5mm !important; padding: 1.5mm 2mm !important;
+    border: 1px solid #91b7d1 !important; background: #d9eaf5 !important; color: #123b5d !important;
+    font-size: 10pt !important; font-weight: 900 !important; line-height: 1.15 !important; text-align: center !important;
+  }
+  #spk .size-list-empty {
+    padding: 3mm !important; border: 1px dashed #cbd8e4 !important;
+    color: #76889a !important; font-style: italic !important;
+  }
+
+  /* Approval stays at the bottom as a full-width five-column signing table. */
+  #spk .approval-section {
+    flex: 0 0 auto !important; margin: auto 0 8mm !important; padding: 3mm !important;
+    border: 1px solid #1a456e !important; border-radius: 2mm !important; background: #fff !important;
+    break-inside: avoid !important; page-break-inside: avoid !important;
+  }
+  #spk .approval-section > .section-title {
+    position: relative !important; z-index: 3 !important; display: flex !important;
+    align-items: center !important; gap: 0 !important; height: 8mm !important;
+    margin: -6mm 0 2.5mm !important; padding: 0 !important;
+    border: 0 !important; background: transparent !important;
+  }
+  #spk .approval-section > .section-title > span {
+    display: inline-flex !important; align-items: center !important; min-height: 8mm !important;
+    padding: 1.8mm 3mm !important; border: 1px solid #0e4978 !important;
+    background: #0e4978 !important; color: #fff !important;
+    font-size: 10.5pt !important; font-weight: 850 !important;
+  }
+  #spk .approval-section > .section-title h3 {
+    display: inline-flex !important; align-items: center !important; min-height: 8mm !important;
+    margin: 0 !important; padding: 1.8mm 4mm 1.8mm 2mm !important;
+    background: #0e4978 !important; color: #fff !important;
+    font-size: 10.5pt !important; font-weight: 850 !important; line-height: 1.1 !important;
+  }
+  #spk .approval-table {
+    display: grid !important; grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    width: 100% !important; border-top: 1px solid #344d64 !important; border-left: 1px solid #344d64 !important;
+  }
+  #spk .approval-table div {
+    display: block !important; box-sizing: border-box !important; min-width: 0 !important;
+    min-height: 17mm !important; padding: 1.5mm 1mm !important;
+    border-right: 1px solid #344d64 !important; border-bottom: 1px solid #344d64 !important;
+    color: #172b40 !important; font-size: 9pt !important; line-height: 1.15 !important;
+    text-align: center !important; overflow-wrap: anywhere !important;
+  }
+  #spk .approval-table .approval-head {
+    min-height: 8mm !important; background: #edf2f6 !important;
+    color: #172b40 !important; font-weight: 850 !important;
+  }
+  #spk .approval-table .production-head { grid-column: auto !important; }
+}
