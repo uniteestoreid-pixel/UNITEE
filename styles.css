@@ -1720,3 +1720,38 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
   }
   #spk .approval-table .production-head { grid-column: auto !important; }
 }
+
+/* Header date clearance: keep the SPK number and creation date above the divider. */
+@media print {
+  #spk .document-header {
+    flex: 0 0 29mm !important;
+    height: 29mm !important;
+    min-height: 29mm !important;
+    padding: 0 0 4mm !important;
+    align-items: center !important;
+  }
+  #spk .document-heading {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    min-height: 0 !important;
+    padding: 0 0 1.5mm !important;
+  }
+  #spk .document-meta {
+    gap: 2mm !important;
+    margin-top: 2.2mm !important;
+    line-height: 1.25 !important;
+  }
+  #spk .document-meta span:first-child {
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+  }
+  #spk .document-meta span:last-child {
+    display: block !important;
+    padding-bottom: 1mm !important;
+    font-size: 8.5pt !important;
+    line-height: 1.35 !important;
+    white-space: nowrap !important;
+  }
+}
