@@ -3826,3 +3826,13 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
     max-height: 250px !important;
   }
 }
+
+
+/* Larger full-page SPK design preview for A4 print/PDF. */
+@media print {
+  #spk .design-slot {
+    height: 370px !important;
+    min-height: 370px !important;
+    max-height: 370px !important;
+  }
+}
