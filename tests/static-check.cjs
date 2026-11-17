@@ -344,8 +344,8 @@ assert.match(templatePrintCss, /@page \{ size: A4 portrait; margin: 0; \}/,
   'Template print must use A4 with zero browser page margin');
 assert.match(templatePrintCss, /#spk\.spk\s*\{[^}]*width:\s*210mm !important;[^}]*min-height:\s*297mm !important;[^}]*padding:\s*7mm !important;/s,
   'Template print must use a 210×297mm page with 7mm internal padding');
-assert.match(css, /#spk \.design-slot\s*\{[^}]*height:\s*250px !important;[^}]*min-height:\s*250px !important;[^}]*max-height:\s*250px !important;/s,
-  'SPK print design preview must be slightly enlarged to 250px');
+assert.match(css, /#spk \.design-slot\s*\{[^}]*height:\s*370px !important;[^}]*min-height:\s*370px !important;[^}]*max-height:\s*370px !important;/s,
+  'SPK print design preview must be enlarged to fill the A4 sheet');
 assert.match(templatePrintCss, /#spk \.detail-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 5fr\) minmax\(0, 6fr\) !important/s,
   'Template print order and size panels must use a 5:6 column ratio');
 assert.match(templatePrintCss, /#spk \.detail-size-panel \.size-list\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s,
