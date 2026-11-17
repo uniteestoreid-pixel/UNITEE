@@ -54,6 +54,17 @@ assert.match(script, /async function preparePrintImages\(/, 'Print must wait for
 assert.match(script, /images\.map\(image => waitForImageReady\(image\)\)/, 'Print image wait callback must pass the image element');
 assert.match(css, /\.spk \.size-list-group\s*\{[^}]*break-inside:\s*avoid/s, 'Print size groups should stay together');
 assert.match(css, /\.spk \.approval-section\s*\{[^}]*page-break-inside:\s*avoid/s, 'Approval section should stay together in print');
+
+assert.match(css, /#spk \.size-list\s*\{[^}]*display:\s*grid !important;[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s,
+  'Print size groups must use a compact two-column layout');
+assert.match(css, /#spk #previewSizeBreakdown::before\s*\{[^}]*grid-column:\s*1 \/ -1/s,
+  'The size breakdown title must span both print columns');
+assert.match(css, /#spk \.size-list-total\s*\{[^}]*grid-column:\s*1 \/ -1/s,
+  'The size total must span both print columns');
+assert.match(css, /#spk\.spk\s*\{[^}]*height:\s*auto !important;[^}]*min-height:\s*287mm !important;/s,
+  'SPK must grow beyond one page instead of clipping a large size breakdown');
+assert.match(css, /#spk \.detail-layout\s*\{[^}]*break-inside:\s*auto !important;/s,
+  'A long detail order block must be allowed to continue onto another page');
 assert.match(css, /\.spk\s*\{[^}]*display:\s*flex/s, 'Print document should use vertical flex layout');
 assert.ok(html.includes('id="designNotesCaption"') && html.includes('id="pNotes"'),
   'Notes must appear together with the uploaded design and garment guide');
