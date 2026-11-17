@@ -2543,3 +2543,129 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
     margin: 3mm 0 2mm !important;
   }
 }
+
+
+/* Final print correction: natural-height detail panels with consistent compact spacing. */
+@media print {
+  #spk.spk {
+    height: auto !important;
+    min-height: 287mm !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Do not stretch the Detail Order section to fill the whole page. */
+  #spk .detail-section {
+    display: block !important;
+    flex: 0 0 auto !important;
+    flex-direction: initial !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin-top: 3mm !important;
+  }
+  #spk .detail-section .detail-layout {
+    display: grid !important;
+    flex: 0 0 auto !important;
+    grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr) !important;
+    align-items: stretch !important;
+    height: auto !important;
+    min-height: 0 !important;
+    gap: 2.5mm !important;
+  }
+  #spk .detail-panel {
+    display: block !important;
+    flex: 0 0 auto !important;
+    align-self: stretch !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding-bottom: 2mm !important;
+  }
+
+  /* Order fields stay together at the top with a fixed row rhythm. */
+  #spk .detail-order-panel .info {
+    display: grid !important;
+    flex: 0 0 auto !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    justify-content: start !important;
+    align-content: start !important;
+    height: auto !important;
+    min-height: 0 !important;
+    row-gap: .9mm !important;
+  }
+  #spk .detail-order-panel .info > div {
+    flex: 0 0 auto !important;
+    min-height: 5.4mm !important;
+    padding: .25mm 0 !important;
+    font-size: 7.4pt !important;
+    line-height: 1.08 !important;
+  }
+
+  /* Size cards follow normal row order with equal, small gaps. */
+  #spk .detail-size-panel .size-list {
+    display: grid !important;
+    flex: 0 0 auto !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: min-content !important;
+    align-content: start !important;
+    align-items: start !important;
+    height: auto !important;
+    min-height: 0 !important;
+    row-gap: 1.5mm !important;
+    column-gap: 1.5mm !important;
+  }
+  #spk .detail-size-panel .size-list-group {
+    display: block !important;
+    align-self: start !important;
+    width: 100% !important;
+    height: auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #spk .detail-size-panel .size-list-heading {
+    min-height: 4.8mm !important;
+    padding: .8mm .8mm !important;
+    font-size: 6.8pt !important;
+    line-height: 1.05 !important;
+  }
+  #spk .detail-size-panel .size-list-items { display: block !important; }
+  #spk .detail-size-panel .size-list-item {
+    display: grid !important;
+    grid-template-columns: 7mm minmax(0, 1fr) !important;
+    align-items: center !important;
+    min-height: 4.1mm !important;
+    gap: .6mm !important;
+    padding: .5mm .7mm !important;
+    border: 0 !important;
+    border-top: .2mm solid #d2dfeb !important;
+    font-size: 6.8pt !important;
+    line-height: 1.05 !important;
+    text-align: left !important;
+  }
+  #spk .detail-size-panel .size-label,
+  #spk .detail-size-panel .size-qty {
+    display: block !important;
+    min-width: 0 !important;
+    font-size: 6.8pt !important;
+    font-weight: 800 !important;
+    text-align: left !important;
+  }
+  #spk .detail-size-panel .size-qty { white-space: nowrap !important; }
+  #spk .detail-size-panel .size-list-total {
+    grid-column: 1 / -1 !important;
+    min-height: 5.2mm !important;
+    margin: 0 !important;
+    padding: .7mm 1mm !important;
+    font-size: 7.5pt !important;
+  }
+
+  /* Approval follows the detail panels at a consistent distance, no forced huge gap. */
+  #spk .approval-section {
+    flex: 0 0 auto !important;
+    margin: 4mm 0 2mm !important;
+    padding: 2mm !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}
