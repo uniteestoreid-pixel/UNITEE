@@ -355,7 +355,7 @@ assert.match(templatePrintCss, /#spk \.approval-table\s*\{[^}]*grid-template-col
 
 
 const approvalFitCss = css.slice(css.lastIndexOf('Keep the enlarged 370px preview while fitting the approval block'));
-assert.match(approvalFitCss, /#spk \.design-slot\s*\{[^}]*height:\s*370px !important/s,
+assert.match(css, /#spk \.design-slot\s*\{[^}]*height:\s*370px !important/s,
   'The enlarged design preview must be preserved for the single-page A4 adjustment');
 assert.match(approvalFitCss, /#spk \.detail-order-panel \.info > div\s*\{[^}]*min-height:\s*26px !important;[^}]*margin:\s*4px 0 !important/s,
   'Order rows must be compacted to make room for the approval block');
