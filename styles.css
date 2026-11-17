@@ -2450,3 +2450,96 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
   #spk .design-preview,
   #spk .approval-section { break-inside: avoid !important; page-break-inside: avoid !important; }
 }
+
+
+/* A4 balance correction: stretch the detail panels to fill the space above approval. */
+@media print {
+  #spk.spk {
+    height: 287mm !important;
+    min-height: 287mm !important;
+    max-height: 287mm !important;
+  }
+
+  /* The detail section absorbs the remaining page height instead of leaving a blank gap. */
+  #spk .detail-section {
+    display: flex !important;
+    flex: 1 1 0 !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    margin-top: 3mm !important;
+  }
+  #spk .detail-section .detail-layout {
+    display: grid !important;
+    flex: 1 1 auto !important;
+    grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr) !important;
+    align-items: stretch !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    gap: 2.5mm !important;
+  }
+  #spk .detail-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    align-self: stretch !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    padding-bottom: 2.5mm !important;
+  }
+
+  /* Spread the order fields vertically in the left panel. */
+  #spk .detail-order-panel .info {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    flex-direction: column !important;
+    justify-content: space-evenly !important;
+    align-content: stretch !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    row-gap: 1mm !important;
+  }
+  #spk .detail-order-panel .info > div {
+    flex: 0 0 auto !important;
+    min-height: 5.2mm !important;
+    font-size: 7.4pt !important;
+  }
+
+  /* Spread size-category cards down the right panel instead of crowding at the top. */
+  #spk .detail-size-panel .size-list {
+    display: grid !important;
+    flex: 1 1 auto !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: min-content !important;
+    align-content: space-between !important;
+    align-items: start !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    row-gap: 2.2mm !important;
+    column-gap: 1.5mm !important;
+  }
+  #spk .detail-size-panel .size-list-group {
+    width: 100% !important;
+    min-width: 0 !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #spk .detail-size-panel .size-list-heading {
+    min-height: 4.8mm !important;
+    padding: .8mm .8mm !important;
+    font-size: 6.8pt !important;
+  }
+  #spk .detail-size-panel .size-list-item {
+    min-height: 3.8mm !important;
+    padding: .45mm .7mm !important;
+    font-size: 6.8pt !important;
+  }
+  #spk .detail-size-panel .size-label,
+  #spk .detail-size-panel .size-qty {
+    font-size: 6.8pt !important;
+  }
+
+  /* Keep the approval block at the bottom of the same A4 sheet. */
+  #spk .approval-section {
+    flex: 0 0 auto !important;
+    margin: 3mm 0 2mm !important;
+  }
+}

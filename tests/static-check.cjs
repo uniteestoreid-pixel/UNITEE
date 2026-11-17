@@ -68,6 +68,15 @@ assert.match(css, /#spk \.detail-size-panel \.size-list-item\s*\{[^}]*min-height
   'Compact A4 size rows must use reduced vertical height');
 assert.match(css, /#spk \.approval-table div\s*\{[^}]*min-height:\s*12mm !important/s,
   'Compact A4 approval signatures must use reduced height');
+
+assert.match(css, /#spk \.detail-section\s*\{[^}]*display:\s*flex !important;[^}]*flex:\s*1 1 0 !important;/s,
+  'The detail section must expand to use the remaining A4 height');
+assert.match(css, /#spk \.detail-order-panel \.info\s*\{[^}]*justify-content:\s*space-evenly !important/s,
+  'Order fields must be vertically distributed in the left detail panel');
+assert.match(css, /#spk \.detail-size-panel \.size-list\s*\{[^}]*align-content:\s*space-between !important/s,
+  'Size category cards must be vertically distributed in the right panel');
+assert.match(css, /#spk \.approval-section\s*\{[^}]*margin:\s*3mm 0 2mm !important/s,
+  'Approval must remain near the bottom after the detail panels expand');
 assert.ok(html.includes('class="detail-panel detail-order-panel"') &&
   html.includes('class="detail-panel detail-size-panel"'),
   'Detail Order and Rincian Ukuran must be rendered as two separate columns');
