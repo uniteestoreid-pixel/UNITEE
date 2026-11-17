@@ -3231,3 +3231,588 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
   }
   #spk .approval-table div { min-height: 16mm !important; }
 }
+
+
+/* Print/PDF layout follows the uploaded "Template Surat Perintah Kerja.html". */
+@page { size: A4 portrait; margin: 0; }
+@media print {
+  html, body {
+    width: 210mm !important;
+    min-width: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #111 !important;
+  }
+  body:not(.accessory-mode):not(.delivery-mode) .app {
+    display: block !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  body:not(.accessory-mode):not(.delivery-mode) .preview-wrap {
+    display: block !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Match .paper: A4 width, minimum page height and 7mm internal padding. */
+  #spk.spk {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    box-sizing: border-box !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    min-height: 297mm !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 auto !important;
+    padding: 7mm !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+
+  /* Header proportions from the template: 150px logo, divider, title and right metadata. */
+  #spk .document-header {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    gap: 16px !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 0 12px !important;
+    border: 0 !important;
+    border-bottom: 3px solid #0b3b82 !important;
+    flex-wrap: nowrap !important;
+  }
+  #spk .logo-placeholder {
+    display: flex !important;
+    flex: 0 0 150px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 150px !important;
+    height: 56px !important;
+    max-height: 56px !important;
+    overflow: hidden !important;
+    border: 0 !important;
+  }
+  #spk .logo-placeholder img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    object-position: left center !important;
+  }
+  #spk #pLogoFallback { display: none !important; }
+  #spk .document-heading {
+    display: grid !important;
+    flex: 1 1 auto !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-rows: auto auto !important;
+    align-items: center !important;
+    column-gap: 8px !important;
+    min-width: 180px !important;
+    margin: 0 !important;
+    padding: 0 0 0 16px !important;
+    border-left: 2px solid #aab !important;
+    text-align: left !important;
+  }
+  #spk .document-kicker {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    margin: 0 !important;
+    color: #111 !important;
+    font-size: 13px !important;
+    line-height: 1.15 !important;
+    letter-spacing: 0 !important;
+    font-weight: 400 !important;
+  }
+  #spk .document-heading h2 {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    margin: 2px 0 0 !important;
+    color: #111 !important;
+    font-size: 24px !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+  }
+  #spk .document-meta {
+    display: flex !important;
+    grid-column: 2 !important;
+    grid-row: 1 / span 2 !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    min-width: 230px !important;
+    margin: 0 !important;
+    color: #111 !important;
+    font-size: 10px !important;
+    line-height: 1.1 !important;
+    text-align: right !important;
+  }
+  #spk .document-meta span:first-child {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    width: 100% !important;
+    height: 32px !important;
+    margin: 0 !important;
+    padding: 0 12px 0 22px !important;
+    clip-path: polygon(8% 0, 100% 0, 100% 100%, 0 100%) !important;
+    background: #0b3b82 !important;
+    color: #fff !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+  }
+  #spk .document-meta span:last-child {
+    display: block !important;
+    height: 14px !important;
+    margin: 8px 0 0 !important;
+    padding: 0 !important;
+    color: #111 !important;
+    font-size: 10px !important;
+    line-height: 14px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Template section rhythm and navy angled tabs. */
+  #spk .document-section { margin-top: 14px !important; }
+  #spk .section-title {
+    position: relative !important;
+    z-index: 2 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    width: auto !important;
+    min-height: 30px !important;
+    margin: 0 0 -1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+  #spk .section-title > span {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 30px !important;
+    min-width: 25px !important;
+    margin: 0 !important;
+    padding: 0 7px !important;
+    background: #0b3b82 !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+  }
+  #spk .section-title h3 {
+    display: inline-flex !important;
+    align-items: center !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    margin: 0 !important;
+    padding: 0 34px 0 14px !important;
+    clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%) !important;
+    background: #0b3b82 !important;
+    color: #fff !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    line-height: 30px !important;
+    letter-spacing: 0 !important;
+    white-space: nowrap !important;
+  }
+  #spk .design-section > .section-title > span { display: none !important; }
+  #spk .design-section > .section-title h3 { min-width: 190px !important; }
+
+  /* Template .box / .preview geometry: 14px padding and 230px preview image. */
+  #spk .design-preview {
+    display: block !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: -1px 0 0 !important;
+    padding: 14px !important;
+    overflow: visible !important;
+    border: 1.5px solid #1d3f7a !important;
+    border-radius: 0 12px 12px 12px !important;
+    background: #fff !important;
+  }
+  #spk .design-slot {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 230px !important;
+    min-height: 230px !important;
+    max-height: 230px !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: #2b2b2b !important;
+  }
+  #spk .design-slot #designPreview[src]:not([src=""]) {
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+  }
+  #spk .design-slot .slot-label { font-size: 11px !important; color: #fff !important; }
+  #spk .design-notes-caption:not([hidden]) {
+    display: flex !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    margin: 10px 0 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: #d6e6f7 !important;
+  }
+  #spk .design-notes-caption > strong {
+    display: flex !important;
+    flex: 0 0 150px !important;
+    align-items: center !important;
+    width: 150px !important;
+    height: 36px !important;
+    margin: 0 !important;
+    padding: 4px 12px !important;
+    border: 0 !important;
+    border-right: 1.5px solid #8aa !important;
+    color: #0b3b82 !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+  }
+  #spk .design-notes-caption .notes-content {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    align-items: center !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 12px !important;
+    color: #111 !important;
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    white-space: pre-wrap !important;
+  }
+  #spk .design-notes-caption[hidden] { display: none !important; }
+
+  /* Template main grid: Detail Order 5fr, Rincian Ukuran 6fr. */
+  #spk .detail-section {
+    display: block !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin-top: 14px !important;
+    overflow: visible !important;
+  }
+  #spk .detail-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr) !important;
+    align-items: start !important;
+    gap: 14px !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: -1px 0 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+  #spk .detail-panel {
+    position: relative !important;
+    display: block !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 42px 14px 14px !important;
+    overflow: visible !important;
+    border: 1.5px solid #1d3f7a !important;
+    border-radius: 0 12px 12px 12px !important;
+    background: #fff !important;
+  }
+  #spk .detail-panel-title {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 2 !important;
+    display: inline-flex !important;
+    align-items: stretch !important;
+    width: auto !important;
+    max-width: 100% !important;
+    min-height: 30px !important;
+    height: 30px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+  #spk .detail-panel-title > span {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 30px !important;
+    min-width: 25px !important;
+    padding: 0 7px !important;
+    background: #0b3b82 !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+  }
+  #spk .detail-panel-title h3 {
+    display: inline-flex !important;
+    align-items: center !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    margin: 0 !important;
+    padding: 0 34px 0 14px !important;
+    clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%) !important;
+    background: #0b3b82 !important;
+    color: #fff !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    line-height: 30px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Detail Order rows follow the template's 130px label and 34px row size. */
+  #spk .detail-order-panel .info {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+  #spk .detail-order-panel .info > div {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    min-width: 0 !important;
+    min-height: 34px !important;
+    height: auto !important;
+    margin: 7px 0 !important;
+    padding: 0 !important;
+    gap: 8px !important;
+    border: 0 !important;
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+  }
+  #spk .detail-order-panel .info dt {
+    display: flex !important;
+    flex: 0 0 130px !important;
+    align-items: center !important;
+    width: 130px !important;
+    min-width: 130px !important;
+    height: 34px !important;
+    margin: 0 !important;
+    padding: 0 12px !important;
+    border: 0 !important;
+    border-radius: 4px !important;
+    background: #d6e6f7 !important;
+    color: #111 !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    line-height: 1.1 !important;
+  }
+  #spk .detail-order-panel .info dt::after { content: none !important; }
+  #spk .detail-order-panel .info dd {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    align-items: center !important;
+    min-width: 0 !important;
+    min-height: 34px !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 2px 0 !important;
+    border: 0 !important;
+    border-bottom: 1.5px solid #9ab !important;
+    color: #111 !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  /* Two size tables per row. Each group has a heading, size/quantity columns and its own total. */
+  #spk .detail-size-panel .size-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-content: start !important;
+    align-items: start !important;
+    grid-auto-rows: min-content !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 11px !important;
+    line-height: 1 !important;
+  }
+  #spk .detail-size-panel .size-list-group {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 1px solid #0b3b82 !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #spk .detail-size-panel .size-list-heading {
+    display: block !important;
+    width: 100% !important;
+    height: 22px !important;
+    min-height: 22px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: #0b3b82 !important;
+    color: #fff !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 22px !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
+    overflow-wrap: anywhere !important;
+  }
+  #spk .detail-size-panel .size-list-items { display: block !important; width: 100% !important; }
+  #spk .detail-size-panel .size-list-column-head,
+  #spk .detail-size-panel .size-list-item,
+  #spk .detail-size-panel .size-list-total {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: 15px !important;
+    min-height: 15px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-top: 1px solid #9ab !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    color: #111 !important;
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    line-height: 15px !important;
+    text-align: center !important;
+  }
+  #spk .detail-size-panel .size-list-column-head {
+    background: #d6e6f7 !important;
+    color: #111 !important;
+    font-weight: 700 !important;
+  }
+  #spk .detail-size-panel .size-list-total {
+    background: #d6e6f7 !important;
+    color: #111 !important;
+    font-weight: 700 !important;
+  }
+  #spk .detail-size-panel .size-list-column-head span + span,
+  #spk .detail-size-panel .size-list-item span + span,
+  #spk .detail-size-panel .size-list-item strong,
+  #spk .detail-size-panel .size-list-total strong {
+    border-left: 1px solid #9ab !important;
+  }
+  #spk .detail-size-panel .size-label,
+  #spk .detail-size-panel .size-qty {
+    display: block !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 2px !important;
+    color: #111 !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 15px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+  #spk .detail-size-panel .size-list-empty {
+    grid-column: 1 / -1 !important;
+    color: #7a8590 !important;
+    font-size: 11px !important;
+    font-style: italic !important;
+  }
+
+  /* Approval uses the template's five equal columns and 30px / 44px signing cells. */
+  #spk .approval-section {
+    position: relative !important;
+    display: block !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 14px 0 0 !important;
+    padding: 8px !important;
+    border: 1.5px solid #1d3f7a !important;
+    border-radius: 0 12px 12px 12px !important;
+    background: #fff !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #spk .approval-section > .section-title {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    display: inline-flex !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    margin: -8px 0 -1px -8px !important;
+  }
+  #spk .approval-table {
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    width: 100% !important;
+    border: 1px solid #1d3f7a !important;
+  }
+  #spk .approval-table div {
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-right: 1px solid #1d3f7a !important;
+    color: #111 !important;
+    font-size: 13px !important;
+  }
+  #spk .approval-table div:nth-child(5n) { border-right: 0 !important; }
+  #spk .approval-table .approval-head {
+    display: block !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    border-bottom: 1px solid #1d3f7a !important;
+    background: #d6e6f7 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 30px !important;
+    text-align: center !important;
+  }
+}
