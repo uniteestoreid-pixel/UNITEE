@@ -2669,3 +2669,360 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
     page-break-inside: avoid !important;
   }
 }
+
+
+/* Final A4 reference composition: large design preview, fixed-height side-by-side detail panels, approval below. */
+@media print {
+  @page { size: A4 portrait; margin: 5mm; }
+
+  #spk.spk {
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    width: 200mm !important;
+    max-width: 200mm !important;
+    height: 287mm !important;
+    min-height: 287mm !important;
+    max-height: 287mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #spk .document-header {
+    flex: 0 0 25mm !important;
+    width: 100% !important;
+    height: 25mm !important;
+    min-height: 25mm !important;
+    padding-bottom: 2.5mm !important;
+  }
+
+  /* Full-width design preview at the top, following the reference proportions. */
+  #spk .design-section {
+    display: block !important;
+    flex: 0 0 auto !important;
+    margin-top: 4mm !important;
+  }
+  #spk .design-section > .section-title {
+    height: 7mm !important;
+    margin: 0 0 -3.2mm !important;
+  }
+  #spk .design-section > .section-title h3 {
+    min-height: 7mm !important;
+    padding: 1.3mm 8mm 1.3mm 3.5mm !important;
+    font-size: 9.5pt !important;
+  }
+  #spk .design-preview {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 63mm auto !important;
+    gap: 1.5mm !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 5mm 2.5mm 2.5mm !important;
+    border: 1px solid #1a456e !important;
+    border-radius: 2mm !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  #spk .design-slot {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    height: 63mm !important;
+    min-height: 63mm !important;
+    overflow: hidden !important;
+    background: #303030 !important;
+  }
+  #spk .design-notes-caption:not([hidden]) {
+    display: grid !important;
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    grid-template-columns: 46mm minmax(0, 1fr) !important;
+    align-items: center !important;
+    min-height: 10mm !important;
+    padding: 1.5mm 3mm !important;
+  }
+  #spk .design-notes-caption > strong {
+    font-size: 7.2pt !important;
+    line-height: 1.1 !important;
+  }
+  #spk .design-notes-caption .notes-content {
+    font-size: 8.5pt !important;
+    line-height: 1.15 !important;
+  }
+
+  /* Main body: keep two columns aligned and use a fixed reference-like height. */
+  #spk .detail-section {
+    display: block !important;
+    flex: 0 0 118mm !important;
+    height: 118mm !important;
+    min-height: 118mm !important;
+    max-height: 118mm !important;
+    margin-top: 4mm !important;
+    overflow: visible !important;
+  }
+  #spk .detail-section .detail-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    gap: 4mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+  #spk .detail-panel {
+    display: block !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 8mm 3mm 3mm !important;
+    border: 1px solid #1a456e !important;
+    border-radius: 2mm !important;
+    background: #fff !important;
+    overflow: hidden !important;
+  }
+  #spk .detail-panel-title {
+    position: absolute !important;
+    top: -1px !important;
+    left: -1px !important;
+    z-index: 2 !important;
+    display: flex !important;
+    align-items: stretch !important;
+    height: 7mm !important;
+    min-height: 7mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+  #spk .detail-panel-title > span {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 1.2mm 1mm 1.2mm 3mm !important;
+    background: #0e4978 !important;
+    color: #fff !important;
+    font-size: 8pt !important;
+    font-weight: 850 !important;
+  }
+  #spk .detail-panel-title h3 {
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 7mm !important;
+    margin: 0 !important;
+    padding: 1.2mm 5mm 1.2mm 2mm !important;
+    border: 0 !important;
+    background: #0e4978 !important;
+    color: #fff !important;
+    font-size: 9pt !important;
+    font-weight: 850 !important;
+    line-height: 1.1 !important;
+    clip-path: polygon(0 0, 100% 0, 91% 100%, 0 100%) !important;
+  }
+
+  /* Order fields sit together near the top with deliberate, even row spacing. */
+  #spk .detail-order-panel .info {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-content: start !important;
+    justify-content: start !important;
+    row-gap: 2mm !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+  #spk .detail-order-panel .info > div {
+    display: grid !important;
+    grid-template-columns: minmax(25mm, .85fr) minmax(0, 1.15fr) !important;
+    align-items: center !important;
+    min-width: 0 !important;
+    min-height: 7mm !important;
+    gap: 1.5mm !important;
+    padding: .5mm 0 !important;
+    border: 0 !important;
+    font-size: 8pt !important;
+    line-height: 1.15 !important;
+  }
+  #spk .detail-order-panel .info dt {
+    padding: 1.2mm 1.6mm !important;
+    border: 1px solid #c3d9e9 !important;
+    border-radius: 1mm !important;
+    background: #e3eff7 !important;
+    color: #183e60 !important;
+    font-size: 7.8pt !important;
+    font-weight: 750 !important;
+  }
+  #spk .detail-order-panel .info dt::after {
+    content: ":" !important;
+    float: right !important;
+    margin-left: 1mm !important;
+  }
+  #spk .detail-order-panel .info dd {
+    min-width: 0 !important;
+    margin: 0 !important;
+    color: #172b40 !important;
+    font-size: 8.2pt !important;
+    font-weight: 850 !important;
+    line-height: 1.15 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  /* Size cards form a regular two-column grid, always starting at the top-left. */
+  #spk .detail-size-panel { padding-right: 2.5mm !important; padding-left: 2.5mm !important; }
+  #spk .detail-size-panel .size-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: min-content !important;
+    align-content: start !important;
+    align-items: start !important;
+    gap: 2mm 2.5mm !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #spk .detail-size-panel #previewSizeBreakdown::before { display: none !important; content: none !important; }
+  #spk .detail-size-panel .size-list-group {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 1px solid #b9d2e5 !important;
+    border-radius: 1mm !important;
+    background: #fff !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #spk .detail-size-panel .size-list-heading {
+    min-height: 5mm !important;
+    margin: 0 !important;
+    padding: .8mm 1mm !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #0e4978 !important;
+    color: #fff !important;
+    font-size: 7.2pt !important;
+    font-weight: 850 !important;
+    line-height: 1.05 !important;
+    text-align: center !important;
+    overflow-wrap: anywhere !important;
+  }
+  #spk .detail-size-panel .size-list-items { display: block !important; width: 100% !important; }
+  #spk .detail-size-panel .size-list-item {
+    display: grid !important;
+    grid-template-columns: 8mm minmax(0, 1fr) !important;
+    align-items: center !important;
+    min-height: 4.6mm !important;
+    gap: .5mm !important;
+    padding: .55mm .8mm !important;
+    border: 0 !important;
+    border-top: .2mm solid #d2dfeb !important;
+    color: #172b40 !important;
+    font-size: 7.2pt !important;
+    line-height: 1.05 !important;
+    text-align: left !important;
+  }
+  #spk .detail-size-panel .size-label,
+  #spk .detail-size-panel .size-qty {
+    display: block !important;
+    min-width: 0 !important;
+    color: #172b40 !important;
+    font-size: 7.2pt !important;
+    font-weight: 800 !important;
+    text-align: left !important;
+  }
+  #spk .detail-size-panel .size-qty { white-space: nowrap !important; }
+  #spk .detail-size-panel .size-list-total {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    align-items: center !important;
+    min-height: 5.5mm !important;
+    margin: 0 !important;
+    padding: .8mm 1mm !important;
+    border: 1px solid #91b7d1 !important;
+    background: #d9eaf5 !important;
+    color: #123b5d !important;
+    font-size: 8pt !important;
+    font-weight: 900 !important;
+    line-height: 1.05 !important;
+    text-align: center !important;
+  }
+
+  /* Approval follows the panels with the same proportion as the supplied A4 reference. */
+  #spk .approval-section {
+    display: block !important;
+    flex: 0 0 auto !important;
+    margin: 4mm 0 2mm !important;
+    padding: 2.5mm !important;
+    border: 1px solid #1a456e !important;
+    border-radius: 2mm !important;
+    background: #fff !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #spk .approval-section > .section-title {
+    position: relative !important;
+    z-index: 2 !important;
+    display: flex !important;
+    align-items: center !important;
+    height: 7mm !important;
+    margin: -5mm 0 2mm !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+  #spk .approval-section > .section-title > span,
+  #spk .approval-section > .section-title h3 {
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 7mm !important;
+    padding: 1.2mm 3mm !important;
+    background: #0e4978 !important;
+    color: #fff !important;
+    font-size: 9pt !important;
+    font-weight: 850 !important;
+  }
+  #spk .approval-table {
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    width: 100% !important;
+    border-top: 1px solid #344d64 !important;
+    border-left: 1px solid #344d64 !important;
+  }
+  #spk .approval-table div {
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    min-height: 16mm !important;
+    padding: 1.2mm 1mm !important;
+    border-right: 1px solid #344d64 !important;
+    border-bottom: 1px solid #344d64 !important;
+    color: #172b40 !important;
+    font-size: 8.5pt !important;
+    line-height: 1.1 !important;
+    text-align: center !important;
+    overflow-wrap: anywhere !important;
+  }
+  #spk .approval-table .approval-head {
+    min-height: 7mm !important;
+    background: #edf2f6 !important;
+    font-weight: 850 !important;
+  }
+}
