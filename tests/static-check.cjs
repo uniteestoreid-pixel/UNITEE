@@ -57,6 +57,17 @@ assert.match(css, /\.spk \.approval-section\s*\{[^}]*page-break-inside:\s*avoid/
 
 assert.match(css, /#spk \.detail-size-panel \.size-list\s*\{[^}]*display:\s*grid !important;[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s,
   'Print size groups must use a compact two-column layout');
+
+assert.match(script, /<strong class="size-qty">: \$\{item\.qty\} pcs<\/strong>/,
+  'Size quantities must print inline as M : 10 pcs');
+assert.doesNotMatch(script, /size-list-column-head/,
+  'Size breakdown must not use separate UKURAN and JUMLAH header columns');
+assert.match(css, /#spk \.design-slot\s*\{[^}]*height:\s*57mm !important/s,
+  'Compact one-page A4 mode must reduce the design preview height');
+assert.match(css, /#spk \.detail-size-panel \.size-list-item\s*\{[^}]*min-height:\s*3\.5mm !important/s,
+  'Compact A4 size rows must use reduced vertical height');
+assert.match(css, /#spk \.approval-table div\s*\{[^}]*min-height:\s*12mm !important/s,
+  'Compact A4 approval signatures must use reduced height');
 assert.ok(html.includes('class="detail-panel detail-order-panel"') &&
   html.includes('class="detail-panel detail-size-panel"'),
   'Detail Order and Rincian Ukuran must be rendered as two separate columns');
