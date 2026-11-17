@@ -352,3 +352,14 @@ assert.match(templatePrintCss, /#spk \.detail-size-panel \.size-list\s*\{[^}]*gr
   'Template print size cards must be arranged in two columns');
 assert.match(templatePrintCss, /#spk \.approval-table\s*\{[^}]*grid-template-columns:\s*repeat\(5, minmax\(0, 1fr\)\)/s,
   'Template print approval must use five equal columns');
+
+
+const approvalFitCss = css.slice(css.lastIndexOf('Keep the enlarged 370px preview while fitting the approval block'));
+assert.match(css, /#spk \.design-slot\s*\{[^}]*height:\s*370px !important/s,
+  'The enlarged design preview must be preserved for the single-page A4 adjustment');
+assert.match(approvalFitCss, /#spk \.detail-order-panel \.info > div\s*\{[^}]*min-height:\s*26px !important;[^}]*margin:\s*4px 0 !important/s,
+  'Order rows must be compacted to make room for the approval block');
+assert.match(approvalFitCss, /#spk \.approval-table div\s*\{[^}]*min-height:\s*34px !important/s,
+  'Approval signature area must be compact enough for one A4 page');
+assert.match(approvalFitCss, /#spk \.approval-section\s*\{[^}]*break-inside:\s*avoid !important/s,
+  'Approval table must stay together when it fits on the page');
