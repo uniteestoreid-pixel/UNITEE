@@ -80,6 +80,17 @@ assert.match(css, /#spk \.detail-order-panel \.info\s*\{[^}]*justify-content:\s*
   'Order fields must stay grouped at the top of the left panel');
 assert.match(css, /#spk \.detail-size-panel \.size-list\s*\{[^}]*align-content:\s*start !important;[^}]*row-gap:\s*1\.5mm !important;/s,
   'Size cards must use consistent compact gaps rather than space-between');
+
+assert.match(css, /#spk \.design-preview\s*\{[^}]*grid-template-rows:\s*63mm auto !important/s,
+  'Reference A4 preview must use the target height');
+assert.match(css, /#spk \.detail-section\s*\{[^}]*flex:\s*0 0 118mm !important;[^}]*height:\s*118mm !important/s,
+  'Reference A4 detail panels must have a fixed matching height');
+assert.match(css, /#spk \.detail-size-panel \.size-list\s*\{[^}]*align-content:\s*start !important;[^}]*gap:\s*2mm 2\.5mm !important/s,
+  'Reference A4 size cards must use a top-aligned regular two-column grid');
+assert.match(css, /#spk \.approval-section\s*\{[^}]*margin:\s*4mm 0 2mm !important/s,
+  'Reference A4 approval must follow the details with a consistent gap');
+assert.match(script, /<strong class="size-qty">: \$\{item\.qty\} pcs<\/strong>/,
+  'Size quantities must retain inline formatting');
 assert.match(css, /#spk \.approval-section\s*\{[^}]*margin:\s*4mm 0 2mm !important/s,
   'Approval must follow the natural-height detail panels without an artificial gap');
 assert.match(css, /#spk \.approval-section\s*\{[^}]*margin:\s*3mm 0 2mm !important/s,
