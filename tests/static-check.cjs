@@ -98,7 +98,7 @@ assert.match(css, /\.spk \.size-list-group\s*\{[^}]*border:\s*0; border-radius:\
   'Print sleeve quantity groups must stay compact without card boxes');
 
 assert.match(css, /\.size-list\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s, 'Print sleeve groups should be arranged in two columns');
-assert.match(script, /LENGAN PJG/, 'Long-sleeve size groups must use the compact long-sleeve label');
+assert.match(script, /PANJANG/, 'Long-sleeve size groups must use the PANJANG label');
 assert.match(script, /LENGAN PENDEK/, 'Short-sleeve size groups must use the compact short-sleeve label');
 assert.match(css, /\.spk \.size-list-group--long \.size-list-heading,[\s\S]*?\.spk \.size-list-group--long \.size-list-item \{ color: #ef2929; \}/,
   'Long-sleeve headings and quantities must be red in print');
