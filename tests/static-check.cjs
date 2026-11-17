@@ -73,8 +73,15 @@ assert.match(css, /#spk \.detail-section\s*\{[^}]*display:\s*flex !important;[^}
   'The detail section must expand to use the remaining A4 height');
 assert.match(css, /#spk \.detail-order-panel \.info\s*\{[^}]*justify-content:\s*space-evenly !important/s,
   'Order fields must be vertically distributed in the left detail panel');
-assert.match(css, /#spk \.detail-size-panel \.size-list\s*\{[^}]*align-content:\s*space-between !important/s,
-  'Size category cards must be vertically distributed in the right panel');
+
+assert.match(css, /#spk \.detail-section\s*\{[^}]*flex:\s*0 0 auto !important;[^}]*height:\s*auto !important;/s,
+  'Detail section must use natural content height rather than filling the whole page');
+assert.match(css, /#spk \.detail-order-panel \.info\s*\{[^}]*justify-content:\s*start !important;[^}]*align-content:\s*start !important;/s,
+  'Order fields must stay grouped at the top of the left panel');
+assert.match(css, /#spk \.detail-size-panel \.size-list\s*\{[^}]*align-content:\s*start !important;[^}]*row-gap:\s*1\.5mm !important;/s,
+  'Size cards must use consistent compact gaps rather than space-between');
+assert.match(css, /#spk \.approval-section\s*\{[^}]*margin:\s*4mm 0 2mm !important/s,
+  'Approval must follow the natural-height detail panels without an artificial gap');
 assert.match(css, /#spk \.approval-section\s*\{[^}]*margin:\s*3mm 0 2mm !important/s,
   'Approval must remain near the bottom after the detail panels expand');
 assert.ok(html.includes('class="detail-panel detail-order-panel"') &&
