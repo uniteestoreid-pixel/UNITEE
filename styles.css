@@ -3916,3 +3916,17 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
     font-size: 11px !important;
   }
 }
+
+
+/* Keep Approval anchored to the lower edge of the A4 SPK page. */
+@media print {
+  #spk.spk {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 297mm !important;
+  }
+  #spk .approval-section {
+    flex: 0 0 auto !important;
+    margin: auto 0 0 !important;
+  }
+}
