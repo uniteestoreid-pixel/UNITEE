@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f4f6f8">
   <title>SPK Generator</title>
-  <link rel="stylesheet" href="styles.css?v=20261117-spk-size-grid-v5">
+  <link rel="stylesheet" href="styles.css?v=20261117-spk-two-order-columns-v6">
 </head>
 <body>
   <header class="app-header">
@@ -141,20 +141,25 @@
           </div>
         </section>
 
-        <section class="document-section">
-          <div class="section-title"><span>02</span><h3>Detail order</h3></div>
+        <section class="document-section detail-section">
           <div class="detail-layout">
-            <dl class="info">
-              <div><dt>Customer</dt><dd id="pCustomer">unitee</dd></div>
-              <div><dt>Order</dt><dd id="pOrder">Diponegoro</dd></div>
-              <div><dt>Tanggal order</dt><dd id="pOrderDate"></dd></div>
-              <div><dt>Deadline</dt><dd id="pDeadline"></dd></div>
-              <div><dt>Model kerah</dt><dd id="pModelKerah">V Neck</dd></div>
-              <div><dt>Material</dt><dd id="pMaterial">Emblos</dd></div>
-              <div><dt>Colour</dt><dd id="pColour">Hitam</dd></div>
-              <div><dt>Quantity</dt><dd><span id="pQuantity">0</span> pcs</dd></div>
-            </dl>
-            <div id="previewSizeBreakdown" class="size-list" aria-label="Daftar ukuran yang dipesan"></div>
+            <div class="detail-panel detail-order-panel">
+              <div class="section-title detail-panel-title"><span>02</span><h3>Detail Order</h3></div>
+              <dl class="info">
+                <div><dt>Customer</dt><dd id="pCustomer">unitee</dd></div>
+                <div><dt>Order</dt><dd id="pOrder">Diponegoro</dd></div>
+                <div><dt>Tanggal order</dt><dd id="pOrderDate"></dd></div>
+                <div><dt>Deadline</dt><dd id="pDeadline"></dd></div>
+                <div><dt>Model kerah</dt><dd id="pModelKerah">V Neck</dd></div>
+                <div><dt>Material</dt><dd id="pMaterial">Emblos</dd></div>
+                <div><dt>Colour</dt><dd id="pColour">Hitam</dd></div>
+                <div><dt>Quantity</dt><dd><span id="pQuantity">0</span> pcs</dd></div>
+              </dl>
+            </div>
+            <div class="detail-panel detail-size-panel">
+              <div class="section-title detail-panel-title"><span aria-hidden="true"></span><h3>Rincian Ukuran</h3></div>
+              <div id="previewSizeBreakdown" class="size-list" aria-label="Daftar ukuran yang dipesan"></div>
+            </div>
           </div>
         </section>
 
