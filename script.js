@@ -272,7 +272,7 @@ function updateSizes() {
       const sleeveClass = category.id.endsWith("-panjang")
         ? "size-list-group--long"
         : category.id.endsWith("-3-4") ? "size-list-group--three-quarter" : "size-list-group--short";
-      groups.push(`<div class="size-list-group ${sleeveClass}"><div class="size-list-heading">${sleeve}${audience}</div><div class="size-list-items"><div class="size-list-column-head"><span>UKURAN</span><span>JUMLAH</span></div>${items.map(item => `<div class="size-list-item"><span class="size-label">${item.size}</span><strong class="size-qty">${item.qty} pcs</strong></div>`).join("")}</div></div>`);
+      groups.push(`<div class="size-list-group ${sleeveClass}"><div class="size-list-heading">${sleeve}${audience}</div><div class="size-list-items">${items.map(item => `<div class="size-list-item"><span class="size-label">${item.size}</span><strong class="size-qty">: ${item.qty} pcs</strong></div>`).join("")}</div></div>`);
     }
   });
   $("#previewSizeBreakdown").innerHTML = groups.length

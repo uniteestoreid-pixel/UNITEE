@@ -2236,3 +2236,217 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
   }
   #spk .detail-size-panel .size-list-empty { grid-column: 1 / -1 !important; }
 }
+
+
+/* Final compact A4 fit: preserve two major columns and category cards, shorten every vertical block. */
+@media print {
+  @page { size: A4 portrait; margin: 5mm; }
+
+  #spk.spk {
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 200mm !important;
+    max-width: 200mm !important;
+    height: 287mm !important;
+    min-height: 287mm !important;
+    max-height: 287mm !important;
+    overflow: visible !important;
+  }
+
+  /* Header remains clear, but uses less vertical space than the previous date-safe version. */
+  #spk .document-header {
+    flex: 0 0 25mm !important;
+    height: 25mm !important;
+    min-height: 25mm !important;
+    padding-bottom: 2.5mm !important;
+  }
+  #spk .document-heading h2 { font-size: 17pt !important; }
+  #spk .document-kicker { font-size: 8pt !important; }
+  #spk .document-meta {
+    gap: 1.2mm !important;
+    margin-top: 1.5mm !important;
+    font-size: 7.5pt !important;
+  }
+  #spk .document-meta span:first-child {
+    padding: 1mm 2.5mm !important;
+    font-size: 8pt !important;
+  }
+  #spk .document-meta span:last-child {
+    padding-bottom: .4mm !important;
+    font-size: 7.5pt !important;
+    line-height: 1.15 !important;
+  }
+  #spk .logo-placeholder {
+    flex-basis: 45mm !important;
+    width: 45mm !important;
+    height: 15mm !important;
+    max-height: 15mm !important;
+  }
+
+  /* Reduce design preview height while keeping the jersey image wide and centered. */
+  #spk .document-section { margin-top: 2.5mm !important; }
+  #spk .design-section > .section-title {
+    height: 6.5mm !important;
+    margin: 0 0 -3mm !important;
+  }
+  #spk .design-section > .section-title h3 {
+    min-height: 6.5mm !important;
+    padding: 1.2mm 7mm 1.2mm 3mm !important;
+    font-size: 9pt !important;
+  }
+  #spk .design-preview {
+    grid-template-rows: 57mm auto !important;
+    gap: 1mm !important;
+    padding: 5mm 2mm 2mm !important;
+  }
+  #spk .design-slot {
+    height: 57mm !important;
+    min-height: 57mm !important;
+  }
+  #spk .design-notes-caption:not([hidden]) {
+    grid-template-columns: 42mm minmax(0, 1fr) !important;
+    min-height: 8.5mm !important;
+    padding: 1.2mm 2.5mm !important;
+  }
+  #spk .design-notes-caption > strong {
+    padding-right: 2mm !important;
+    font-size: 6.6pt !important;
+    line-height: 1.05 !important;
+  }
+  #spk .design-notes-caption .notes-content {
+    padding-left: 2.5mm !important;
+    font-size: 7.5pt !important;
+    line-height: 1.1 !important;
+  }
+
+  /* Keep Detail Order and Rincian Ukuran beside each other. */
+  #spk .detail-section { margin-top: 3mm !important; }
+  #spk .detail-layout {
+    grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr) !important;
+    gap: 2.5mm !important;
+    align-items: stretch !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  #spk .detail-panel {
+    padding: 6.5mm 2mm 2mm !important;
+    min-width: 0 !important;
+  }
+  #spk .detail-panel-title,
+  #spk .detail-panel-title h3 {
+    min-height: 6.5mm !important;
+  }
+  #spk .detail-panel-title > span {
+    padding: 1.1mm 1mm 1.1mm 2.5mm !important;
+    font-size: 7.5pt !important;
+  }
+  #spk .detail-panel-title h3 {
+    padding: 1.1mm 4mm 1.1mm 1.5mm !important;
+    font-size: 8pt !important;
+  }
+
+  /* Order labels and values: compact rows, readable weight. */
+  #spk .detail-order-panel .info { row-gap: .35mm !important; }
+  #spk .detail-order-panel .info > div {
+    grid-template-columns: minmax(21mm, .82fr) minmax(0, 1.18fr) !important;
+    min-height: 5mm !important;
+    gap: 1mm !important;
+    padding: .2mm 0 !important;
+    font-size: 7.2pt !important;
+    line-height: 1.05 !important;
+  }
+  #spk .detail-order-panel .info dt {
+    padding: .7mm 1mm !important;
+    border-radius: .7mm !important;
+    font-size: 7pt !important;
+  }
+  #spk .detail-order-panel .info dd {
+    font-size: 7.2pt !important;
+    line-height: 1.08 !important;
+  }
+
+  /* Two columns of size-category cards; each size prints as “M : 10 pcs”. */
+  #spk .detail-size-panel .size-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1.1mm !important;
+    align-content: start !important;
+    align-items: start !important;
+  }
+  #spk .detail-size-panel .size-list-group {
+    margin: 0 !important;
+    border-radius: .8mm !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #spk .detail-size-panel .size-list-heading {
+    min-height: 4.2mm !important;
+    padding: .6mm .7mm !important;
+    font-size: 6.5pt !important;
+    line-height: 1.02 !important;
+  }
+  #spk .detail-size-panel .size-list-items { display: block !important; }
+  #spk .detail-size-panel .size-list-item {
+    display: grid !important;
+    grid-template-columns: 7mm minmax(0, 1fr) !important;
+    align-items: center !important;
+    min-height: 3.5mm !important;
+    gap: .5mm !important;
+    padding: .35mm .7mm !important;
+    border: 0 !important;
+    border-top: .2mm solid #d2dfeb !important;
+    font-size: 6.5pt !important;
+    line-height: 1 !important;
+    text-align: left !important;
+  }
+  #spk .detail-size-panel .size-label {
+    display: block !important;
+    font-size: 6.5pt !important;
+    font-weight: 800 !important;
+    text-align: left !important;
+  }
+  #spk .detail-size-panel .size-qty {
+    display: block !important;
+    min-width: 0 !important;
+    font-size: 6.5pt !important;
+    font-weight: 800 !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+  }
+  #spk .detail-size-panel .size-list-total {
+    min-height: 4.5mm !important;
+    padding: .5mm 1mm !important;
+    font-size: 7.2pt !important;
+  }
+
+  /* Short approval signature area stays on the same A4 sheet. */
+  #spk .approval-section {
+    margin: auto 0 2mm !important;
+    padding: 2mm !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #spk .approval-section > .section-title {
+    height: 6.5mm !important;
+    margin: -4.8mm 0 1.5mm !important;
+  }
+  #spk .approval-section > .section-title > span,
+  #spk .approval-section > .section-title h3 {
+    min-height: 6.5mm !important;
+    padding-top: 1mm !important;
+    padding-bottom: 1mm !important;
+    font-size: 8pt !important;
+  }
+  #spk .approval-table div {
+    min-height: 12mm !important;
+    padding: 1mm .6mm !important;
+    font-size: 7.2pt !important;
+  }
+  #spk .approval-table .approval-head { min-height: 5.5mm !important; }
+
+  /* This one-page compact mode assumes the six standard categories and avoids large empty gaps. */
+  #spk .detail-panel,
+  #spk .design-preview,
+  #spk .approval-section { break-inside: avoid !important; page-break-inside: avoid !important; }
+}
