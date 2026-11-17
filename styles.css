@@ -1755,3 +1755,90 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
     white-space: nowrap !important;
   }
 }
+
+
+/* Size-heavy SPK print: two compact size cards per row, with safe continuation. */
+@media print {
+  /* Let the document grow naturally when a full size breakdown needs another A4 page. */
+  #spk.spk {
+    height: auto !important;
+    min-height: 287mm !important;
+    overflow: visible !important;
+  }
+  #spk .detail-layout {
+    grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr) !important;
+    align-items: start !important;
+    min-height: 0 !important;
+    height: auto !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+  #spk .size-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-content: start !important;
+    align-items: start !important;
+    column-gap: 2mm !important;
+    row-gap: 1.5mm !important;
+    min-width: 0 !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+  #spk #previewSizeBreakdown::before {
+    grid-column: 1 / -1 !important;
+    justify-self: start !important;
+    margin: 0 0 .5mm !important;
+  }
+  #spk .size-list-group {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #spk .size-list-heading {
+    min-height: 5mm !important;
+    padding: .85mm 1mm !important;
+    border-radius: .8mm .8mm 0 0 !important;
+    font-size: 7.2pt !important;
+    line-height: 1.1 !important;
+    overflow-wrap: anywhere !important;
+  }
+  #spk .size-list-column-head,
+  #spk .size-list-item {
+    grid-template-columns: minmax(0, .8fr) minmax(0, 1fr) !important;
+    min-height: 4.2mm !important;
+    gap: .5mm !important;
+    padding: .55mm .6mm !important;
+    font-size: 7.3pt !important;
+    line-height: 1.05 !important;
+  }
+  #spk .size-list-column-head span,
+  #spk .size-list-item span,
+  #spk .size-list-item strong {
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+  #spk .size-list-total {
+    grid-column: 1 / -1 !important;
+    min-height: 5.8mm !important;
+    margin-top: .5mm !important;
+    padding: .8mm 1.5mm !important;
+    font-size: 8.5pt !important;
+  }
+  #spk .size-list-empty { grid-column: 1 / -1 !important; }
+  /* Keep category tables intact; allow the overall details block to continue if it is too long. */
+  #spk .size-list-group,
+  #spk .size-list-group .size-list-heading,
+  #spk .size-list-group .size-list-column-head {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #spk .approval-section {
+    margin-top: auto !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}
