@@ -83,10 +83,17 @@ assert.match(css, /#spk \.detail-size-panel \.size-list\s*\{[^}]*align-content:\
 
 assert.match(css, /#spk \.design-preview\s*\{[^}]*grid-template-rows:\s*63mm auto !important/s,
   'Reference A4 preview must use the target height');
-assert.match(css, /#spk \.detail-section\s*\{[^}]*flex:\s*0 0 118mm !important;[^}]*height:\s*118mm !important/s,
-  'Reference A4 detail panels must have a fixed matching height');
+assert.match(css, /#spk \.detail-section\s*\{[^}]*flex:\s*0 0 126mm !important;[^}]*height:\s*126mm !important/s,
+  'Full A4 detail panels must use the reference-proportioned height');
 assert.match(css, /#spk \.detail-size-panel \.size-list\s*\{[^}]*align-content:\s*start !important;[^}]*gap:\s*2mm 2\.5mm !important/s,
   'Reference A4 size cards must use a top-aligned regular two-column grid');
+
+assert.match(css, /@page \{ size: A4 portrait; margin: 0; \}/,
+  'Full A4 mode must use the whole A4 paper');
+assert.match(css, /#spk\.spk\s*\{[^}]*width:\s*196mm !important;[^}]*height:\s*283mm !important;/s,
+  'SPK page must occupy the full A4 sheet inside a 7mm safe margin');
+assert.match(css, /#spk\.spk\s*\{[^}]*justify-content:\s*space-between !important/s,
+  'Major SPK sections must use the full A4 height without stretching content inside panels');
 assert.match(css, /#spk \.approval-section\s*\{[^}]*margin:\s*4mm 0 2mm !important/s,
   'Reference A4 approval must follow the details with a consistent gap');
 assert.match(script, /<strong class="size-qty">: \$\{item\.qty\} pcs<\/strong>/,
