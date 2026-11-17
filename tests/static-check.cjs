@@ -366,3 +366,8 @@ assert.match(approvalFitCss, /#spk \.approval-section\s*\{[^}]*break-inside:\s*a
 
 assert.match(approvalFitCss, /#spk \.document-section,\s*#spk \.detail-section,\s*#spk \.approval-section\s*\{[^}]*margin-top:\s*8px !important/s,
   'SPK print sections must use compact spacing to keep approval on the first A4 page');
+
+
+const approvalBottomRule = css.slice(css.lastIndexOf('Keep Approval anchored to the lower edge'));
+assert.match(approvalBottomRule, /#spk \.approval-section\s*\{[^}]*margin:\s*auto 0 0 !important/s,
+  'Approval must sit against the bottom of the A4 SPK page');
