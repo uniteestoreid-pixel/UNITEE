@@ -60,8 +60,10 @@ assert.match(css, /#spk \.detail-size-panel \.size-list\s*\{[^}]*display:\s*grid
 
 assert.match(script, /<strong class="size-qty">: \$\{item\.qty\} pcs<\/strong>/,
   'Size quantities must print inline as M : 10 pcs');
-assert.doesNotMatch(script, /size-list-column-head/,
-  'Size breakdown must not use separate UKURAN and JUMLAH header columns');
+assert.match(script, /size-list-column-head/,
+  'Size breakdown must use UKURAN and JUMLAH headers from the supplied print template');
+assert.match(script, /<div class="size-list-total"><span>TOTAL<\/span><strong>\$\{groupTotal\} pcs<\/strong><\/div>/,
+  'Each size category must print its own category total');
 assert.match(css, /#spk \.design-slot\s*\{[^}]*height:\s*57mm !important/s,
   'Compact one-page A4 mode must reduce the design preview height');
 assert.match(css, /#spk \.detail-size-panel \.size-list-item\s*\{[^}]*min-height:\s*3\.5mm !important/s,
@@ -333,3 +335,20 @@ console.log('Static checks passed: UI selectors, A4 accessory pagination, worksp
 
 
 
+
+
+const templatePrintMarker = css.lastIndexOf('Print/PDF layout follows the uploaded "Template Surat Perintah Kerja.html"');
+assert.ok(templatePrintMarker >= 0, 'Template-based print styling is missing');
+const templatePrintCss = css.slice(templatePrintMarker);
+assert.match(templatePrintCss, /@page \{ size: A4 portrait; margin: 0; \}/,
+  'Template print must use A4 with zero browser page margin');
+assert.match(templatePrintCss, /#spk\.spk\s*\{[^}]*width:\s*210mm !important;[^}]*min-height:\s*297mm !important;[^}]*padding:\s*7mm !important;/s,
+  'Template print must use a 210×297mm page with 7mm internal padding');
+assert.match(templatePrintCss, /#spk \.design-slot\s*\{[^}]*height:\s*230px !important/s,
+  'Template print design preview must use 230px height');
+assert.match(templatePrintCss, /#spk \.detail-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 5fr\) minmax\(0, 6fr\) !important/s,
+  'Template print order and size panels must use a 5:6 column ratio');
+assert.match(templatePrintCss, /#spk \.detail-size-panel \.size-list\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s,
+  'Template print size cards must be arranged in two columns');
+assert.match(templatePrintCss, /#spk \.approval-table\s*\{[^}]*grid-template-columns:\s*repeat\(5, minmax\(0, 1fr\)\)/s,
+  'Template print approval must use five equal columns');
