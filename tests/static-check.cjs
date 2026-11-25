@@ -371,3 +371,12 @@ assert.match(approvalFitCss, /#spk \.document-section,\s*#spk \.detail-section,\
 const approvalBottomRule = css.slice(css.lastIndexOf('Keep Approval anchored to the lower edge'));
 assert.match(approvalBottomRule, /#spk \.approval-section\s*\{[^}]*margin:\s*auto 0 0 !important/s,
   'Approval must sit against the bottom of the A4 SPK page');
+
+
+const notesAutoHeightCss = css.slice(css.lastIndexOf('Prevent production notes from being clipped in A4 print'));
+assert.match(notesAutoHeightCss, /#spk \.design-notes-caption:not\(\[hidden\]\)\s*\{[^}]*height:\s*auto !important;[^}]*min-height:\s*48px !important;[^}]*max-height:\s*none !important;[^}]*overflow:\s*visible !important/s,
+  'Printed SPK notes caption must grow with multiline content instead of clipping it');
+assert.match(notesAutoHeightCss, /#spk \.design-notes-caption > strong\s*\{[^}]*height:\s*auto !important;[^}]*min-height:\s*48px !important;[^}]*white-space:\s*normal !important/s,
+  'Printed notes label must be allowed to wrap across multiple lines');
+assert.match(notesAutoHeightCss, /#spk \.design-notes-caption \.notes-content\s*\{[^}]*height:\s*auto !important;[^}]*min-height:\s*48px !important;[^}]*overflow-wrap:\s*anywhere !important/s,
+  'Printed note text must wrap and expand the caption height');
