@@ -3930,3 +3930,57 @@ body.delivery-mode .header-actions > :not(#accountMenuBtn) { display: none !impo
     margin: auto 0 0 !important;
   }
 }
+
+
+/* Prevent production notes from being clipped in A4 print/PDF. */
+@media print {
+  #spk .design-preview {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  #spk .design-notes-caption:not([hidden]) {
+    display: flex !important;
+    align-items: stretch !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 48px !important;
+    max-height: none !important;
+    margin: 10px 0 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #spk .design-notes-caption > strong {
+    display: flex !important;
+    flex: 0 0 150px !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+    width: 150px !important;
+    height: auto !important;
+    min-height: 48px !important;
+    margin: 0 !important;
+    padding: 6px 12px !important;
+    white-space: normal !important;
+    overflow-wrap: break-word !important;
+    line-height: 1.15 !important;
+  }
+  #spk .design-notes-caption .notes-content {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 48px !important;
+    margin: 0 !important;
+    padding: 6px 12px !important;
+    overflow: visible !important;
+    white-space: pre-wrap !important;
+    overflow-wrap: anywhere !important;
+    line-height: 1.25 !important;
+  }
+}
